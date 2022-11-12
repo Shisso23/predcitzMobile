@@ -1,26 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useRef, useEffect, useState} from 'react';
-import {Button, FAB, Dialog, ListItem} from '@rneui/themed';
-import {ImageBackground, Platform, StyleSheet, View} from 'react-native';
-import _, {Dictionary} from 'lodash';
-import ActionSheet from 'react-native-actions-sheet';
+import {FAB, Dialog, ListItem} from '@rneui/themed';
+import {
+  FlatList,
+  ImageBackground,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
+import ActionSheet, {
+  useScrollHandlers,
+  ActionSheetRef,
+} from 'react-native-actions-sheet';
 
 import UserInfo from '../components/user-info/user-info';
-import {useNavigation} from '@react-navigation/native';
 import Images from '../components/theme/Images';
 import LeagueActionSheetContent from '../components/extracted/leagues-action-sheet-content';
 import {useDispatch} from 'react-redux';
-import {
-  LeagueDataLeagueModel,
-  LeagueDataSeasonsModel,
-  LeaguesFilterModel,
-} from '../models/leagues';
-import {geFilteredLeaguesAction} from '../reducers/leagues/leagues.actions';
+import {LeagueDataLeagueModel, LeaguesFilterModel} from '../models/leagues';
 import {useSelector} from 'react-redux';
 import leaguesService from '../services/leagues';
 import {leaguesSelector, setLeagues} from '../reducers/leagues/leagues.reducer';
-import {Colors} from '../theme/Variables';
-import {favoriteLeagueIds, seasonsBack} from '../data-config/data-config';
+import {
+  betOptions,
+  favoriteLeagueIds,
+  seasonsBack,
+} from '../data-config/data-config';
 import {LeagueDataModel} from '../models/leagues/index';
 import {getStandingsByLeagueId} from '../services/standings';
 import {
@@ -29,7 +34,7 @@ import {
 } from '../models/standings-models';
 import DateTimeInput from '../components/extracted/date-time-input';
 import moment from 'moment';
-import {favLeagues} from '../../mock-data';
+// import {favLeagues} from '../../mock-data';
 import {getFilteredFixtures} from '../services/fixtures';
 import {
   FixtureDataModel,
@@ -42,8 +47,11 @@ import Fixtures from '../components/extracted/fixtures';
 import BetOptions from '../components/extracted/bet-options';
 
 const WelcomeScreen: React.FC = () => {
-  const navigation = useNavigation<any>();
-  const actionSheetRef = useRef<any>();
+  const actionSheetRef = useRef<ActionSheetRef>(null);
+  const scrollHandlers = useScrollHandlers<FlatList>(
+    'flatlist-1',
+    actionSheetRef,
+  );
   const dispatch = useDispatch<any>();
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [leaguesStandings, setLeaguesStandings] = useState<StandingsModel[]>(
@@ -55,23 +63,12 @@ const WelcomeScreen: React.FC = () => {
   const [currentFixtures, setCurrentFixtures] = useState<FixtureDataModel[]>(
     [],
   );
-  const [loadingStandings, setLoadingStandings] = useState<Boolean>(false);
+  // const [loadingStandings, setLoadingStandings] = useState<Boolean>(false);
   const [allFixtures, setAllFixtures] = useState<FixtureDataModel[]>([]);
   const [isLoadingLeagues, setIsLoadingLeagues] = useState(false);
-  // const [groupedPredictionsData, setGroupedPredictionsData] = useState<
-  //   {
-  //     fixtures: FixtureDataModel[];
-  //     option: {
-  //       name: String;
-  //       id: number;
-  //       level: number;
-  //       shortName: String;
-  //       description: string;
-  //     };
-  //   }[]
-  // >([]);
+
   const [selectedOptions, setSelectedOptions] = useState<betOptionModel[] | []>(
-    [],
+    betOptions,
   );
   const [predictedFixtures, setPredictedFixtures] = useState<
     {
@@ -84,8 +81,7 @@ const WelcomeScreen: React.FC = () => {
         description: string;
       };
     }[]
-  >([]); //TODO try making a model for the bet option and reuse it
-  // const [selectedLeagues, setSelectedLeagues] = useState<LeagueDataModel[]>();
+  >([]);
   const [fromDate, setFromDate] = useState(
     new Date(moment().subtract(1, 'days').format('YYYY-MM-DD')),
   );
@@ -118,8 +114,6 @@ const WelcomeScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    /*This predicted fixtures will give me a list of each prediction function result like. [{fixtures, option}, ...] so for me to display it on the jsx if one bet option is selected; only display the predictions for that bet option if there's any. If a level is selected; display prediction functions results for those options and merge them. if a fixtures is returned from 2 prediction functions. Add an Or eg. Over 1.5 or GG )
-     */
     setCurrentFixtures(filterFixtresBetweenDates(fromDate, toDate));
   }, [fromDate.toString(), toDate.toString()]);
 
@@ -135,37 +129,40 @@ const WelcomeScreen: React.FC = () => {
     }
   }, [selectedOptions.length]);
 
-  // useEffect(() => {
-  // const groupedPredictionsData_ = _.groupBy(
-  //   predictedFixtures,
-  //   predictedFixture => predictedFixture.option.shortName,
-  // );
-  // setGroupedPredictionsData(groupedPredictionsData_);
-  // }, [JSON.stringify(predictedFixtures)]);
-
   useEffect(() => {
-    // if (readyToFetch) {
-    //   setIsLoadingLeagues(true);
-    //   leaguesService
-    //     .getFilteredLeagues(leaguesFilters)
-    //     .then(response => {
-    //       console.log({response});
-    //       dispatch(setLeagues(response.data.response));
-    //       setFavoriteLeagues(getFavoriteLeagues(response.data.response));
-    //     })
-    //     .finally(() => {
-    //       setIsLoadingLeagues(false);
-    //     });
-    // }
+    if (readyToFetch) {
+      setIsLoadingLeagues(true);
+      leaguesService
+        .getFilteredLeagues(leaguesFilters)
+        .then(response => {
+          dispatch(setLeagues(response.data.response));
+          setFavoriteLeagues(getFavoriteLeagues(response.data.response));
+        })
+        .finally(() => {
+          setIsLoadingLeagues(false);
+        });
+    }
   }, [readyToFetch]);
 
   useEffect(() => {
     setCurrentFixtures(filterFixtresBetweenDates(fromDate, toDate));
+    console.log({futureFixtures});
   }, [futureFixtures?.length]);
 
   useEffect(() => {
-    // fetchLeaguesSeasonsFixtures();
-  }, [selectedLeagues.length]);
+    let leagueToFetchFixturesFor: LeagueDataLeagueModel[] = [];
+    selectedLeagues.forEach(league => {
+      if (
+        allFixtures.length > 0 &&
+        allFixtures.some(fixtureData => fixtureData.league.id === league.id)
+      ) {
+      } else {
+        leagueToFetchFixturesFor = [...leagueToFetchFixturesFor, league];
+      }
+    });
+
+    fetchLeaguesSeasonsFixtures(leagueToFetchFixturesFor);
+  }, [JSON.stringify(selectedLeagues)]);
 
   const predict = () => {
     const predictions = selectedOptions.map((option: betOptionModel) =>
@@ -194,17 +191,18 @@ const WelcomeScreen: React.FC = () => {
   };
 
   const getFavoriteLeagues = (leagues_: any) => {
-    console.log({leagues_});
     return leagues_?.filter((league: LeagueDataModel) =>
       favoriteLeagueIds.some(id => `${id}` === `${league.league.id}`),
     );
   };
 
-  const getLeaguesSeasonsFixtures = async () => {
+  const getLeaguesSeasonsFixtures = async (
+    leagueToFetchFixturesFor: LeagueDataLeagueModel[],
+  ) => {
     setLoadingLeaguesFixtures(true);
-    if (selectedLeagues) {
+    if (leagueToFetchFixturesFor) {
       return Promise.all(
-        selectedLeagues.map(async (league: LeagueDataLeagueModel) => {
+        leagueToFetchFixturesFor.map(async (league: LeagueDataLeagueModel) => {
           const seasons = seasonsBack;
           return Promise.all(
             seasons.map(async (season: number) => {
@@ -230,24 +228,26 @@ const WelcomeScreen: React.FC = () => {
     });
   };
 
-  const fetchLeaguesSeasonsFixtures = async () => {
-    console.log('fetching');
-    getLeaguesSeasonsFixtures()
+  const fetchLeaguesSeasonsFixtures = async (
+    leagueToFetchFixturesFor: LeagueDataLeagueModel[],
+  ) => {
+    console.log({leagueToFetchFixturesFor});
+    getLeaguesSeasonsFixtures(leagueToFetchFixturesFor)
       .then(responses => {
-        console.log({responses});
         if (responses) {
-          setAllFixtures(
+          console.log({responses});
+          const allSortedFixtures = responses
+            .flat()
+            .sort((fixtureA, fixtureB) => {
+              return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
+            });
+          const futureSortedFixtures = filterFutureFixtures(
             responses.flat().sort((fixtureA, fixtureB) => {
               return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
             }),
           );
-          setFutureFixtures(
-            filterFutureFixtures(
-              responses.flat().sort((fixtureA, fixtureB) => {
-                return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
-              }),
-            ),
-          );
+          setAllFixtures([...allFixtures, ...allSortedFixtures]);
+          setFutureFixtures([...futureFixtures, ...futureSortedFixtures]);
         }
       })
       .finally(() => {
@@ -272,23 +272,31 @@ const WelcomeScreen: React.FC = () => {
   };
 
   const handleNextClick = async (selectedLeagues_: LeagueDataLeagueModel[]) => {
-    console.log({selectedLeagues_});
-    setStandingsLoading(true);
-    setSelectedLeagues(selectedLeagues_);
-    return Promise.all(
-      selectedLeagues_.map(league => {
-        return getStandingsByLeagueId({
-          leagueId: league.id,
-          season: seasonsBack[0],
+    let newlyAddedLeagues: LeagueDataLeagueModel[] = [];
+    selectedLeagues_.forEach(league_ => {
+      if (selectedLeagues.some(league => league.id === league_.id)) {
+      } else {
+        newlyAddedLeagues = [...newlyAddedLeagues, league_];
+      }
+    });
+    if (newlyAddedLeagues.length > 0) {
+      setStandingsLoading(true);
+      setSelectedLeagues([...selectedLeagues, ...newlyAddedLeagues]);
+      return Promise.all(
+        newlyAddedLeagues.map(league => {
+          return getStandingsByLeagueId({
+            leagueId: league.id,
+            season: seasonsBack[0],
+          });
+        }),
+      )
+        .then(standings => {
+          setLeaguesStandings([...leaguesStandings, ...standings]);
+        })
+        .finally(() => {
+          setStandingsLoading(false);
         });
-      }),
-    )
-      .then(standings => {
-        setLeaguesStandings(standings);
-      })
-      .finally(() => {
-        setStandingsLoading(false);
-      });
+    }
   };
 
   const handleSelectedOptions = (options: betOptionModel[]) => {
@@ -325,6 +333,9 @@ const WelcomeScreen: React.FC = () => {
         ref={actionSheetRef}
         gestureEnabled
         containerStyle={styles.actionSheet}
+        keyboardHandlerEnabled
+        animated={false}
+        isModal
         // onClose={onActionSheetClose}
       >
         <LeagueActionSheetContent
@@ -333,7 +344,9 @@ const WelcomeScreen: React.FC = () => {
               selectedLeagues_.map(league => league.league),
             );
           }}
-          leagues={favLeagues}
+          scrollHandlers={scrollHandlers}
+          favoriteLeagues={favoriteLeagues}
+          allLeagues={leagues ? leagues : []}
           closeActionSheet={onActionSheetClose}
           initiallySelectedLeagues={[]}
           loading={standingsLoading}
@@ -374,7 +387,6 @@ const styles = StyleSheet.create({
   },
   container: {flex: 1},
   fab: {
-    backgroundColor: 'red',
     position: 'absolute',
     bottom: '8%',
     right: '45%',

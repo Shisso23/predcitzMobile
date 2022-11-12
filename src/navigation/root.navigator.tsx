@@ -23,5 +23,4 @@ const AppContainer: React.FC = () => {
     </NavigationContainer>
   );
 };
-console.log({AppContainer});
 export default AppContainer;

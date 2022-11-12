@@ -2070,7 +2070,6 @@ export const getHomeTeamStanding = ({
           teamStanding = standing_;
         }
       });
-      console.log({teamStanding1: teamStanding});
     });
   });
   return teamStanding;
@@ -2093,7 +2092,6 @@ export const getAwayTeamStanding = ({
           teamStanding = standing_;
         }
       });
-      console.log({teamStanding2: teamStanding});
     });
   });
   return teamStanding;

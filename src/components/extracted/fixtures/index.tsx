@@ -8,7 +8,7 @@ import {FixtureDataModel} from '../../../models/fixtures';
 import {StandingsResponseModel} from '../../../models/standings-models';
 import {StyleSheet} from 'react-native';
 import {useTheme} from '../../../theme';
-import {goupedFixtures} from '../../../../mock-data';
+// import {goupedFixtures} from '../../../../mock-data';
 import {Colors} from '../../../theme/Variables';
 import {Button, Image, ListItem} from '@rneui/base';
 import {TouchableOpacity} from 'react-native';
@@ -26,7 +26,7 @@ type FixturesProps = {
     };
   }[];
 };
-const Fixtures: React.FC<FixturesProps> = ({groupedFixtures_}) => {
+const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
   const {Common, Layout, Gutters, Images, Fonts} = useTheme();
   const [selectedItem, setSelectedItem] = useState<FixtureDataModel>();
   const [selectedOption, setSelectedOption] = useState<betOptionModel>();
@@ -35,12 +35,13 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures_}) => {
   >(null);
 
   const reformatData = () => {
-    const data = goupedFixtures.map(data_ => ({
-      title: data_.option.shortName,
-      data: data_.fixtures,
-      option: data_.option,
-    }));
-    console.log({data});
+    const data = groupedFixtures
+      .map(data_ => ({
+        title: data_.option.shortName,
+        data: data_.fixtures,
+        option: data_.option,
+      }))
+      .filter(reformedData => reformedData.data.length > 0);
     return data;
   };
 
@@ -186,6 +187,7 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures_}) => {
 
   const renderFixture = ({
     item,
+    index,
     section,
   }: {
     item: FixtureDataModel;
@@ -202,12 +204,7 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures_}) => {
           selectedItem?.fixture.id === item.fixture.id &&
           section.option.id === selectedOption?.id
         }
-        // expandIcon={{
-        //   Component: renderAccordionIcon(
-        //     selectedItem?.fixture.id === item.fixture.id &&
-        //       index === selectedIndex,
-        //   ),
-        // }}
+        key={`${item.fixture.id}-${index}-${section.option.id}`}
         onPress={handleFixtureExpand(item, section.option)}
         ViewComponent={renderFixtureDetail(item)}
         style={[
@@ -232,7 +229,6 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures_}) => {
     <SafeAreaView style={styles.mainContainer}>
       <SectionList
         sections={reformatData()}
-        keyExtractor={(item, index) => `${item.fixture.id + index}`}
         renderItem={renderFixture}
         renderSectionHeader={({section: {title, option}}) => (
           <Text

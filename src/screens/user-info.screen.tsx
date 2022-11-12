@@ -1,6 +1,5 @@
 import React from 'react';
 import {useDispatch} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
 
 import FormScreenContainer from '../components/containers/form-screen-container/form-screen.container';
 import {setUserNameAction} from '../reducers/user/user.actions';
@@ -10,8 +9,6 @@ import Images from '../components/theme/Images';
 
 const UserInfoScreen: React.FC = () => {
   const dispatch = useDispatch<any>();
-  const navigation = useNavigation<any>();
-  console.log({navigation});
 
   const onSubmit = (formData: {username: string}) => {
     dispatch(setUserNameAction(formData.username));

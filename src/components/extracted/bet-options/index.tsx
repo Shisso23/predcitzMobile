@@ -22,7 +22,6 @@ const BetOptions: React.FC<BetOptionProps> = ({
     useState<betOptionModel[]>(options);
 
   useEffect(() => {
-    console.log({selectedOptions});
     handleSelectedOptions(selectedOptions);
   }, [selectedOptions.length]);
 

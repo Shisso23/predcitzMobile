@@ -1,112 +1,100 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, FlatList, Text} from 'react-native';
-import {Button} from '@rneui/base';
+import React, {useState} from 'react';
+import {StyleSheet, View, Text, Dimensions} from 'react-native';
+import {Tab} from '@rneui/base';
 
 import {useTheme} from '../../../theme';
 import {Colors} from '../../../theme/Variables';
-import LeagueItem from '../league-item';
 import {LeagueDataModel} from '../../../models/leagues/index';
+import FavoriteLeagues from '../favorite-leagues';
+import SearchLeagues from '../leagues-search';
 
 type LeagueyActionSheetContentProps = {
   showResults: Function;
-  leagues: LeagueDataModel[];
+  favoriteLeagues: LeagueDataModel[];
+  allLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   initiallySelectedLeagues: LeagueDataModel[];
   loading: boolean;
+  scrollHandlers: any;
 };
+
+const screenHeight = Dimensions.get('window').height;
 
 const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
   showResults,
-  leagues,
+  favoriteLeagues,
+  allLeagues,
   closeActionSheet,
   initiallySelectedLeagues,
   loading,
+  scrollHandlers,
 }) => {
-  const {Gutters, Common, Layout} = useTheme();
-  const [selectedLeagues, setSelectedLeagues] = useState<LeagueDataModel[]>(
-    initiallySelectedLeagues,
-  );
-  useEffect(() => {
-    console.log({leagues});
-    return () => {
-      clearLeagues();
-    };
-  }, []);
+  const {Gutters, Layout} = useTheme();
+  const [tabIndex, setTabIndex] = useState<number>(0);
 
-  const handleLeagueSelect = (league_: LeagueDataModel, selected: boolean) => {
-    if (selectedLeagues) {
-      if (selected) {
-        setSelectedLeagues([...selectedLeagues, league_]);
-      } else if (!selected) {
-        setSelectedLeagues(
-          selectedLeagues.filter(
-            league => league.league.id !== league_.league.id,
-          ),
-        );
-      }
-    } else {
-      setSelectedLeagues([league_]);
-    }
-  };
-
-  const clearLeagues = () => {
-    setSelectedLeagues([]);
-  };
-
-  const renderLeagues = ({item}: {item: LeagueDataModel}) => {
-    return (
-      <LeagueItem
-        key={`${item.league.id}`}
-        item={item}
-        onPress={(selected: boolean) => {
-          handleLeagueSelect(item, selected);
-        }}
-        selected={initiallySelectedLeagues?.some(league => {
-          return `${league.league.id}` === `${item.league.id}`;
-        })}
-      />
-    );
+  const handleTabChange = (index: number) => {
+    setTabIndex(index);
   };
 
   return (
-    <View style={[Gutters.largeRPadding, Gutters.smallBMargin]}>
+    <View
+      style={[
+        Gutters.smallBMargin,
+        {height: screenHeight * 0.8},
+        Layout.alignItemsCenter,
+      ]}>
       <Text
         style={[Gutters.regularLMargin, Gutters.regularMargin, styles.title]}>
         Leagues
       </Text>
-      <View style={[Gutters.tinyLMargin]}>
-        <FlatList
-          data={leagues}
-          renderItem={renderLeagues}
-          numColumns={3}
-          contentContainerStyle={[Gutters.smallPadding, Gutters.regularRMargin]}
-          scrollEnabled
-        />
+      <View style={Layout.fullWidth}>
+        <Tab
+          value={tabIndex}
+          onChange={handleTabChange}
+          indicatorStyle={styles.tabIndicator}>
+          <Tab.Item
+            style={[
+              styles.tabStyle,
+              {
+                backgroundColor:
+                  tabIndex === 0 ? Colors.secondary : Colors.lightGray,
+              },
+            ]}
+            titleStyle={[styles.tabTitle]}
+            title="Favorites"
+          />
+          <Tab.Item
+            style={[
+              styles.tabStyle,
+              {
+                backgroundColor:
+                  tabIndex === 1 ? Colors.secondary : Colors.lightGray,
+              },
+            ]}
+            titleStyle={[styles.tabTitle]}
+            title="All leagues"
+          />
+        </Tab>
       </View>
-      <View style={[Layout.rowBetween, Gutters.regularMargin]}>
-        <Button
-          title="Show results"
-          onPress={async () => {
-            showResults(selectedLeagues).then(() => {
-              closeActionSheet();
-            });
-          }}
-          containerStyle={[
-            Common.submitButtonContainer,
-            styles.showResultsButton,
-          ]}
+      {tabIndex === 0 ? (
+        <FavoriteLeagues
+          closeActionSheet={closeActionSheet}
+          initiallySelectedLeagues={initiallySelectedLeagues}
+          favoriteLeagues={favoriteLeagues}
+          showResults={showResults}
           loading={loading}
-          buttonStyle={[Common.submitButton, styles.showResultsButtonStyle]}
+          scrollHandlers={scrollHandlers}
         />
-
-        <Button
-          type="clear"
-          title="Clear"
-          onPress={clearLeagues}
-          titleStyle={styles.clearButtonTitle}
-          containerStyle={[Gutters.regularRMargin]}
+      ) : (
+        <SearchLeagues
+          closeActionSheet={closeActionSheet}
+          initiallySelectedLeagues={initiallySelectedLeagues}
+          allLeagues={allLeagues}
+          showResults={showResults}
+          loading={loading}
+          scrollHandlers={scrollHandlers}
         />
-      </View>
+      )}
     </View>
   );
 };
@@ -115,7 +103,16 @@ const styles = StyleSheet.create({
   clearButtonTitle: {color: Colors.gray},
   showResultsButton: {maxHeight: 45},
   showResultsButtonStyle: {height: '100%'},
-  title: {fontSize: 18, fontWeight: '500'},
+  tabIndicator: {
+    backgroundColor: Colors.secondary,
+  },
+  tabTitle: {
+    color: Colors.black,
+  },
+  tabStyle: {
+    backgroundColor: Colors.lightGray,
+  },
+  title: {fontSize: 18, fontWeight: '500', alignSelf: 'center'},
 });
 
 export default LeagueActionSheetContent;

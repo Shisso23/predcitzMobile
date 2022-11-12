@@ -10,4 +10,6 @@ export default () => ({
   upArrow: require('../assets/up-arrow.png'),
   add: require('../assets/add.png'),
   remove: require('../assets/remove.png'),
+  search: require('../assets/search.png'),
+  clear: require('../assets/clear.png'),
 });
