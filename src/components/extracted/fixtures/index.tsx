@@ -260,7 +260,6 @@ const styles = StyleSheet.create({
     marginTop: '25%',
   },
   fixture: {
-    width: 360,
     height: 90,
     padding: 2,
     borderRadius: 10,
@@ -275,11 +274,12 @@ const styles = StyleSheet.create({
     height: 20,
   },
   mainContainer: {
-    alignItems: 'center',
+    marginLeft: 10,
+    marginRight: 10,
   },
   sectionList: {
     width: '100%',
-    marginHorizontal: 10,
+    marginRight: 10,
     paddingBottom: 150,
   },
 });

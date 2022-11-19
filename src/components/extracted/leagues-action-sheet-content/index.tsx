@@ -7,6 +7,7 @@ import {Colors} from '../../../theme/Variables';
 import {LeagueDataModel} from '../../../models/leagues/index';
 import FavoriteLeagues from '../favorite-leagues';
 import SearchLeagues from '../leagues-search';
+import {Image} from '@rneui/themed';
 
 type LeagueyActionSheetContentProps = {
   showResults: Function;
@@ -27,7 +28,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
   initiallySelectedLeagues,
   loading,
 }) => {
-  const {Gutters, Layout} = useTheme();
+  const {Gutters, Layout, Images} = useTheme();
   const [tabIndex, setTabIndex] = useState<number>(0);
 
   const handleTabChange = (index: number) => {
@@ -36,10 +37,23 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
 
   return (
     <View style={{flexGrow: 1}}>
-      <Text
-        style={[Gutters.regularLMargin, Gutters.regularMargin, styles.title]}>
-        Leagues
-      </Text>
+      <View style={[Layout.rowBetween]}>
+        <Text
+          style={[
+            Gutters.regularLMargin,
+            Gutters.regularMargin,
+            styles.title,
+            {alignSelf: 'center'},
+          ]}>
+          Leagues
+        </Text>
+        <Image
+          source={Images.clear}
+          style={{width: 25, height: 25, margin: 10}}
+          onPress={() => closeActionSheet()}
+        />
+      </View>
+
       <View style={Layout.fullWidth}>
         <Tab
           value={tabIndex}

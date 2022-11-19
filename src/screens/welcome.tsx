@@ -1,10 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
-import {FAB, Dialog, ListItem} from '@rneui/themed';
-import {ImageBackground, Platform, StyleSheet, View} from 'react-native';
+import {Dialog, ListItem} from '@rneui/themed';
+import {
+  Image,
+  ImageBackground,
+  Platform,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 
 import UserInfo from '../components/user-info/user-info';
-import Images from '../components/theme/Images';
 import LeagueActionSheetContent from '../components/extracted/leagues-action-sheet-content';
 import {useDispatch} from 'react-redux';
 import {LeagueDataLeagueModel, LeaguesFilterModel} from '../models/leagues';
@@ -36,9 +42,11 @@ import {betOptionModel} from '../models/bet-option-model';
 import Fixtures from '../components/extracted/fixtures';
 import BetOptions from '../components/extracted/bet-options';
 import flashService from '../services/flash-service/flash.service';
+import {useTheme} from '../theme';
 
 const WelcomeScreen: React.FC = () => {
   const dispatch = useDispatch<any>();
+  const {Images} = useTheme();
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [leaguesStandings, setLeaguesStandings] = useState<StandingsModel[]>(
     [],
@@ -303,18 +311,9 @@ const WelcomeScreen: React.FC = () => {
         <ListItem.Title style={styles.title}>Predictions</ListItem.Title>
         <Fixtures groupedFixtures={predictedFixtures} />
       </View>
-      <FAB
-        // icon={{
-        //   name: 'plus',
-        //   type: 'font-awesome',
-        //   size: 30,
-        //   containerStyle: {},
-        // }}
-        size="large"
-        style={styles.fab}
-        color="#3A609C"
-        onPress={handleFABPress}
-      />
+      <TouchableOpacity onPress={handleFABPress} style={styles.fab}>
+        <Image style={styles.fab} source={Images.plus} />
+      </TouchableOpacity>
       <Dialog
         isVisible={leaguesModalVisible}
         onBackdropPress={closeLeaguesModal}
@@ -327,10 +326,10 @@ const WelcomeScreen: React.FC = () => {
             );
           }}
           favoriteLeagues={favoriteLeagues}
-          // favoriteLeagues={favLeagues}
           allLeagues={leagues ? leagues : []}
+          // favoriteLeagues={favLeagues}
           // allLeagues={favLeagues}
-          closeActionSheet={() => {}}
+          closeActionSheet={closeLeaguesModal}
           initiallySelectedLeagues={[]}
           loading={standingsLoading}
         />
@@ -363,16 +362,18 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     bottom: '8%',
-    right: '45%',
+    right: '36%',
     alignItems: 'flex-start',
     justifyContent: 'center',
+    width: 55,
+    height: 55,
   },
   fixtures: {
     width: '100%',
     marginTop: '30%',
   },
   overlay: {
-    height: '65%',
+    height: '75%',
     width: '100%',
     position: 'absolute',
     bottom: '0%',

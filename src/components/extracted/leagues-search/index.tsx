@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Button, Image, Input} from '@rneui/base';
-import {StyleSheet, SafeAreaView, View, FlatList} from 'react-native';
+import {StyleSheet, View, FlatList} from 'react-native';
 
 import {LeagueDataModel} from '../../../models/leagues';
 import {useTheme} from '../../../theme';
 import {Colors} from '../../../theme/Variables';
 import LeagueItem from '../league-item';
+import {FormScreenContainer} from '../../containers';
 
 type SearchLeaguesProps = {
   showResults: Function;
@@ -145,7 +146,7 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <FormScreenContainer contentContainerStyle={styles.container}>
       <Input
         value={searchKeyWord}
         onChangeText={handleSearch}
@@ -172,11 +173,12 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
         contentContainerStyle={[Gutters.largeBPadding, Gutters.smallHPadding]}
       />
       {renderListFooter()}
-    </SafeAreaView>
+    </FormScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {flex: 1},
   clearButtonTitle: {color: Colors.gray},
   inputContainer: {borderWidth: 1, width: '100%', borderRadius: 10},
   searchIcon: {
