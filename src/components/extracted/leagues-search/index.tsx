@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Button, Image, Input} from '@rneui/base';
 import React, {useState} from 'react';
+import {Button, Image, Input} from '@rneui/base';
 import {StyleSheet, SafeAreaView, View, FlatList} from 'react-native';
+
 import {LeagueDataModel} from '../../../models/leagues';
 import {useTheme} from '../../../theme';
 import {Colors} from '../../../theme/Variables';
@@ -13,7 +14,6 @@ type SearchLeaguesProps = {
   initiallySelectedLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   loading: boolean;
-  scrollHandlers: any;
 };
 const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   allLeagues,
@@ -21,7 +21,6 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   initiallySelectedLeagues,
   loading,
   closeActionSheet,
-  scrollHandlers,
 }) => {
   const {Common, Layout, Gutters, Images} = useTheme();
   const [selectedLeagues, setSelectedLeagues] = useState<LeagueDataModel[]>(
@@ -88,14 +87,20 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
             .toLocaleLowerCase()
             .includes(sortedKeyword.toLowerCase()) ||
           data.league.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          data.country.name.toLowerCase().includes(keyword.toLowerCase())
+          data.country.name.toLowerCase().includes(keyword.toLowerCase()) ||
+          `${sortedCountryName.toLowerCase()}${sortedLeagueName.toLowerCase()}`.includes(
+            sortedKeyword.toLowerCase(),
+          ) ||
+          `${sortedLeagueName.toLowerCase()}${sortedCountryName.toLowerCase()}`.includes(
+            sortedKeyword.toLowerCase(),
+          )
         );
       });
       setSearchedLeagues(result);
     }
   };
 
-  const renderListFooter = () => () => {
+  const renderListFooter = () => {
     return (
       <View style={[Layout.rowBetween, Gutters.regularMargin]}>
         <Button
@@ -140,8 +145,7 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   };
 
   return (
-    <SafeAreaView
-      style={[Layout.alignItemsCenter, Gutters.largeBMargin, {flex: 1}]}>
+    <SafeAreaView style={{flex: 1}}>
       <Input
         value={searchKeyWord}
         onChangeText={handleSearch}
@@ -163,19 +167,18 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
       <FlatList
         data={searchKeyWord ? searchedLeagues : allLeagues}
         renderItem={renderLeagues}
-        contentContainerStyle={[Gutters.smallPadding]}
         nestedScrollEnabled
-        ListFooterComponent={renderListFooter()}
         showsVerticalScrollIndicator
-        {...scrollHandlers}
+        contentContainerStyle={[Gutters.largeBPadding, Gutters.smallHPadding]}
       />
+      {renderListFooter()}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   clearButtonTitle: {color: Colors.gray},
-  inputContainer: {borderWidth: 1, width: '90%', borderRadius: 10},
+  inputContainer: {borderWidth: 1, width: '100%', borderRadius: 10},
   searchIcon: {
     width: 20,
     height: 20,

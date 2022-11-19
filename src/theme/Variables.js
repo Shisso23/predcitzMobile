@@ -11,11 +11,11 @@
 export const Colors = {
   transparent: 'rgba(0,0,0,0)',
   inputBackground: '#FFFFFF',
-  secondary: '#EC890C',
+  secondary: '#87CEEB',
   white: '#ffffff',
   black: '#000',
   text: '#212529',
-  primary: '#068D9D',
+  primary: '#309fdb',
   success: '#95F9E3',
   warning: '#D4B483',
   error: '#C1666B',

@@ -15,7 +15,6 @@ type LeagueyActionSheetContentProps = {
   closeActionSheet: Function;
   initiallySelectedLeagues: LeagueDataModel[];
   loading: boolean;
-  scrollHandlers: any;
 };
 
 const screenHeight = Dimensions.get('window').height;
@@ -27,7 +26,6 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
   closeActionSheet,
   initiallySelectedLeagues,
   loading,
-  scrollHandlers,
 }) => {
   const {Gutters, Layout} = useTheme();
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -37,12 +35,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
   };
 
   return (
-    <View
-      style={[
-        Gutters.smallBMargin,
-        {height: screenHeight * 0.8},
-        Layout.alignItemsCenter,
-      ]}>
+    <View style={{flexGrow: 1}}>
       <Text
         style={[Gutters.regularLMargin, Gutters.regularMargin, styles.title]}>
         Leagues
@@ -83,7 +76,6 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
           favoriteLeagues={favoriteLeagues}
           showResults={showResults}
           loading={loading}
-          scrollHandlers={scrollHandlers}
         />
       ) : (
         <SearchLeagues
@@ -92,7 +84,6 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
           allLeagues={allLeagues}
           showResults={showResults}
           loading={loading}
-          scrollHandlers={scrollHandlers}
         />
       )}
     </View>

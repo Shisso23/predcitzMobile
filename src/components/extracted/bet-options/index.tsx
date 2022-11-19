@@ -45,7 +45,7 @@ const BetOptions: React.FC<BetOptionProps> = ({
             backgroundColor: selectedOptions.some(
               option => option.id === item.id,
             )
-              ? Colors.warning
+              ? Colors.secondary
               : Colors.white,
           },
         ]}>

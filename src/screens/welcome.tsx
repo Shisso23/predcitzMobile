@@ -1,17 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useRef, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FAB, Dialog, ListItem} from '@rneui/themed';
-import {
-  FlatList,
-  ImageBackground,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
-import ActionSheet, {
-  useScrollHandlers,
-  ActionSheetRef,
-} from 'react-native-actions-sheet';
+import {ImageBackground, Platform, StyleSheet, View} from 'react-native';
 
 import UserInfo from '../components/user-info/user-info';
 import Images from '../components/theme/Images';
@@ -19,6 +9,8 @@ import LeagueActionSheetContent from '../components/extracted/leagues-action-she
 import {useDispatch} from 'react-redux';
 import {LeagueDataLeagueModel, LeaguesFilterModel} from '../models/leagues';
 import {useSelector} from 'react-redux';
+import moment from 'moment';
+
 import leaguesService from '../services/leagues';
 import {leaguesSelector, setLeagues} from '../reducers/leagues/leagues.reducer';
 import {
@@ -32,9 +24,7 @@ import {
   StandingsModel,
   StandingsResponseModel,
 } from '../models/standings-models';
-import DateTimeInput from '../components/extracted/date-time-input';
-import moment from 'moment';
-// import {favLeagues} from '../../mock-data';
+import {favLeagues} from '../../mock-data';
 import {getFilteredFixtures} from '../services/fixtures';
 import {
   FixtureDataModel,
@@ -45,13 +35,9 @@ import {toMomentDate} from '../helpers/dateTimeHelper';
 import {betOptionModel} from '../models/bet-option-model';
 import Fixtures from '../components/extracted/fixtures';
 import BetOptions from '../components/extracted/bet-options';
+import flashService from '../services/flash-service/flash.service';
 
 const WelcomeScreen: React.FC = () => {
-  const actionSheetRef = useRef<ActionSheetRef>(null);
-  const scrollHandlers = useScrollHandlers<FlatList>(
-    'flatlist-1',
-    actionSheetRef,
-  );
   const dispatch = useDispatch<any>();
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [leaguesStandings, setLeaguesStandings] = useState<StandingsModel[]>(
@@ -59,6 +45,8 @@ const WelcomeScreen: React.FC = () => {
   );
   const [pickerModalOpen, setPickerModalOpen] = useState(false);
   const {leagues} = useSelector(leaguesSelector);
+  const [leaguesModalVisible, setLeaguesModalVisible] =
+    useState<boolean>(false);
   const [futureFixtures, setFutureFixtures] = useState<FixtureDataModel[]>([]);
   const [currentFixtures, setCurrentFixtures] = useState<FixtureDataModel[]>(
     [],
@@ -83,7 +71,7 @@ const WelcomeScreen: React.FC = () => {
     }[]
   >([]);
   const [fromDate, setFromDate] = useState(
-    new Date(moment().subtract(1, 'days').format('YYYY-MM-DD')),
+    new Date(moment().subtract(0, 'days').format('YYYY-MM-DD')),
   );
   const [loadingLeaguesFixtures, setLoadingLeaguesFixtures] = useState(false);
   const [toDate, setToDate] = useState(
@@ -102,9 +90,12 @@ const WelcomeScreen: React.FC = () => {
   };
 
   const handleFABPress = () => {
-    actionSheetRef.current?.setModalVisible(true);
+    setLeaguesModalVisible(true);
   };
 
+  const closeLeaguesModal = () => {
+    setLeaguesModalVisible(false);
+  };
   useEffect(() => {
     setReadyToFetch(true);
   }, []);
@@ -137,6 +128,9 @@ const WelcomeScreen: React.FC = () => {
         .then(response => {
           dispatch(setLeagues(response.data.response));
           setFavoriteLeagues(getFavoriteLeagues(response.data.response));
+        })
+        .catch(() => {
+          flashService.error('Could not fetch leagues!');
         })
         .finally(() => {
           setIsLoadingLeagues(false);
@@ -213,9 +207,11 @@ const WelcomeScreen: React.FC = () => {
               ).data;
               return getLeagueFixturesResponse.response;
             }),
-          ).then(response => {
-            return response.flat();
-          });
+          )
+            .then(response => {
+              return response.flat();
+            })
+            .catch(() => flashService.error('Could not fetch leagues!'));
         }),
       );
     }
@@ -255,20 +251,10 @@ const WelcomeScreen: React.FC = () => {
       });
   };
 
-  const onActionSheetClose = () => {
-    actionSheetRef.current.setModalVisible(false);
-  };
-
   const onStartDateValueChange = (newValue: any) => {
     setPickerModalOpen(!pickerModalOpen);
     const newDate: Date = new Date(newValue);
     setFromDate(newDate);
-  };
-
-  const onEndDateValueChange = (newValue: any) => {
-    setPickerModalOpen(!pickerModalOpen);
-    const newDate: Date = new Date(newValue);
-    setToDate(newDate);
   };
 
   const handleNextClick = async (selectedLeagues_: LeagueDataLeagueModel[]) => {
@@ -329,43 +315,33 @@ const WelcomeScreen: React.FC = () => {
         color="#3A609C"
         onPress={handleFABPress}
       />
-      <ActionSheet
-        ref={actionSheetRef}
-        gestureEnabled
-        containerStyle={styles.actionSheet}
-        keyboardHandlerEnabled
-        animated={false}
-        isModal
-        // onClose={onActionSheetClose}
-      >
+      <Dialog
+        isVisible={leaguesModalVisible}
+        onBackdropPress={closeLeaguesModal}
+        presentationStyle="overFullScreen"
+        overlayStyle={styles.overlay}>
         <LeagueActionSheetContent
           showResults={async (selectedLeagues_: LeagueDataModel[]) => {
             await handleNextClick(
               selectedLeagues_.map(league => league.league),
             );
           }}
-          scrollHandlers={scrollHandlers}
           favoriteLeagues={favoriteLeagues}
+          // favoriteLeagues={favLeagues}
           allLeagues={leagues ? leagues : []}
-          closeActionSheet={onActionSheetClose}
+          // allLeagues={favLeagues}
+          closeActionSheet={() => {}}
           initiallySelectedLeagues={[]}
           loading={standingsLoading}
         />
-      </ActionSheet>
+      </Dialog>
+
       <Dialog
         isVisible={isLoadingLeagues || loadingLeaguesFixtures}
         onBackdropPress={closeModal}>
         <Dialog.Title title="Fetching leagues" />
         <Dialog.Loading />
       </Dialog>
-      <DateTimeInput
-        value={fromDate.toDateString()}
-        onChange={onStartDateValueChange}
-        label="Start date"
-        mode="datetime"
-        format="YYYY-MM-DD HH:mm"
-        errorMessage={''}
-      />
     </ImageBackground>
   );
 };
@@ -381,8 +357,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   background: {
-    flex: 1,
-    width: '100%',
     height: '100%',
   },
   container: {flex: 1},
@@ -396,6 +370,16 @@ const styles = StyleSheet.create({
   fixtures: {
     width: '100%',
     marginTop: '30%',
+  },
+  overlay: {
+    height: '65%',
+    width: '100%',
+    position: 'absolute',
+    bottom: '0%',
+    left: 0,
+    right: 0,
+    padding: 0,
+    margin: 0,
   },
   swipeButton: {width: 280},
   title: {

@@ -12,7 +12,6 @@ type FavoriteLeaguesProps = {
   initiallySelectedLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   loading: boolean;
-  scrollHandlers: any;
 };
 const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
   favoriteLeagues,
@@ -20,7 +19,6 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
   initiallySelectedLeagues,
   loading,
   closeActionSheet,
-  scrollHandlers,
 }) => {
   const {Common, Layout, Gutters} = useTheme();
   const [selectedLeagues, setSelectedLeagues] = useState<LeagueDataModel[]>(
@@ -47,7 +45,7 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
     }
   };
 
-  const renderListFooter = () => () => {
+  const renderListFooter = () => {
     return (
       <View style={[Layout.rowBetween, Gutters.regularMargin]}>
         <Button
@@ -92,16 +90,18 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
   };
 
   return (
-    <SafeAreaView style={[Layout.alignItemsCenter]}>
+    <SafeAreaView style={{flex: 1}}>
       <FlatList
         data={favoriteLeagues}
         renderItem={renderLeagues}
-        numColumns={2}
-        contentContainerStyle={[Gutters.smallPadding, Layout.fulllHeight]}
+        contentContainerStyle={[
+          Gutters.regularTMargin,
+          Gutters.largeBPadding,
+          Gutters.smallHPadding,
+        ]}
         scrollEnabled
-        ListFooterComponent={renderListFooter()}
-        {...scrollHandlers}
       />
+      {renderListFooter()}
     </SafeAreaView>
   );
 };

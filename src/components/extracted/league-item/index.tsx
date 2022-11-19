@@ -37,8 +37,13 @@ const LeagueItem: React.FC<LeagueItemProps> = ({onPress, item, selected}) => {
       key={`${item.league.id}`}
       onPress={handleSelect}>
       <ListItem.Subtitle
-        style={[{color: isSelected ? Colors.white : Colors.black}]}>
-        {item.league.name}
+        numberOfLines={2}
+        style={[
+          {
+            color: isSelected ? Colors.white : Colors.black,
+          },
+        ]}>
+        {`${item.league.name} - ${item.country.name}`}
       </ListItem.Subtitle>
     </TouchableOpacity>
   );
