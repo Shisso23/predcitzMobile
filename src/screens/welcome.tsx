@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     bottom: '8%',
-    right: '36%',
+    right: '39%',
     alignItems: 'flex-start',
     justifyContent: 'center',
     width: 55,

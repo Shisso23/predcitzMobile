@@ -29,7 +29,9 @@ const BetOptions: React.FC<BetOptionProps> = ({
     if (selectedOptions.some(option => option.id === item.id)) {
       setSelectedOptions(selectedOptions.filter(opt => opt.id !== item.id));
     } else {
-      setSelectedOptions([...selectedOptions, item]);
+      const tempOptions = Array.from(selectedOptions);
+      tempOptions.push(item);
+      setSelectedOptions(tempOptions);
     }
   };
 

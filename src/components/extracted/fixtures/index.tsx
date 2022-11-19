@@ -80,14 +80,13 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
           if (action === 'remove') {
             setFavoriteFixtures(removedExistingFixture);
           } else {
-            const newList = [
-              ...removedExistingFixture,
-              {fixture: fixtureData, option},
-            ];
+            const newList = Array.from(removedExistingFixture);
+            newList.push({fixture: fixtureData, option});
             setFavoriteFixtures(newList);
           }
         } else {
-          const newList = [...favoriteFixtures, {fixture: fixtureData, option}];
+          const newList = Array.from(favoriteFixtures);
+          newList.push({fixture: fixtureData, option});
           setFavoriteFixtures(newList);
         }
       } else {
@@ -107,23 +106,19 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
           Gutters.tinyBPadding,
         ]}>
         <View style={[Layout.row, Layout.alignSelfCenter]}>
-          <Image
-            source={{uri: `${item.league.logo}`}}
-            style={[styles.logo, Gutters.tinyRMargin]}
-          />
-          <Text>{item.league.name}</Text>
+          <Text>{`${item.league.name} (${item.league.country})`}</Text>
         </View>
         <View
           style={[Layout.rowBetween, Layout.fullWidth, Gutters.smallHMargin]}>
-          <View style={Layout.row}>
+          <View style={[Layout.row, {width: '47%', justifyContent: 'center'}]}>
             <Image
               source={{uri: `${item.teams.home.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
             />
             <Text>{item.teams.home.name}</Text>
           </View>
-          <Text style={Gutters.regularRMargin}>Vs</Text>
-          <View style={Layout.row}>
+          <Text style={[Gutters.regularRMargin, {width: '6%'}]}>Vs</Text>
+          <View style={[Layout.row, {width: '47%', justifyContent: 'center'}]}>
             <Image
               source={{uri: `${item.teams.away.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
@@ -133,7 +128,9 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
         </View>
         <View style={[Layout.alignItemsCenter, Layout.justifyContentCenter]}>
           <Text style={Fonts.textSmall}>
-            {moment(new Date(`${item.fixture.date}`)).format('DD-MMMM-yyyy')}
+            {moment(new Date(`${item.fixture.date}`)).format(
+              'DD-MMMM-yyyy HH:mm',
+            )}
           </Text>
         </View>
       </View>
@@ -276,6 +273,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     marginLeft: 10,
     marginRight: 10,
+    height: '100%',
   },
   sectionList: {
     width: '100%',
