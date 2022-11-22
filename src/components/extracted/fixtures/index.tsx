@@ -115,7 +115,7 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
               source={{uri: `${item.teams.home.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
             />
-            <Text>{item.teams.home.name}</Text>
+            <Text numberOfLines={2}>{item.teams.home.name}</Text>
           </View>
           <Text style={[Gutters.regularRMargin, {width: '6%'}]}>Vs</Text>
           <View style={[Layout.row, {width: '47%', justifyContent: 'center'}]}>
@@ -123,7 +123,7 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
               source={{uri: `${item.teams.away.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
             />
-            <Text>{item.teams.away.name}</Text>
+            <Text numberOfLines={2}>{item.teams.away.name}</Text>
           </View>
         </View>
         <View style={[Layout.alignItemsCenter, Layout.justifyContentCenter]}>
