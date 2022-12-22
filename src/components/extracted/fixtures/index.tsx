@@ -8,7 +8,7 @@ import {FixtureDataModel} from '../../../models/fixtures';
 import {StandingsResponseModel} from '../../../models/standings-models';
 import {StyleSheet} from 'react-native';
 import {useTheme} from '../../../theme';
-// import {goupedFixturesMock} from '../../../../mock-data';
+import {goupedFixturesMock} from '../../../../mock-data';
 import {Colors} from '../../../theme/Variables';
 import {Button, Image, ListItem} from '@rneui/base';
 import {TouchableOpacity} from 'react-native';
@@ -35,8 +35,8 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
   >(null);
 
   const reformatData = () => {
-    // const data = goupedFixturesMock
-    const data = groupedFixtures
+    const fixtures = __DEV__ ? goupedFixturesMock : groupedFixtures;
+    const data = fixtures
       .map(data_ => ({
         title: data_.option.shortName,
         data: data_.fixtures,

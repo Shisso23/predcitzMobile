@@ -16,6 +16,9 @@ import {useDispatch} from 'react-redux';
 import {LeagueDataLeagueModel, LeaguesFilterModel} from '../models/leagues';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
+import {Text} from 'react-native';
+import {Button} from '@rneui/base';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 
 import leaguesService from '../services/leagues';
 import {leaguesSelector, setLeagues} from '../reducers/leagues/leagues.reducer';
@@ -30,7 +33,7 @@ import {
   StandingsModel,
   StandingsResponseModel,
 } from '../models/standings-models';
-import {favLeagues} from '../../mock-data';
+import {favLeaguesMock} from '../../mock-data';
 import {getFilteredFixtures} from '../services/fixtures';
 import {
   FixtureDataModel,
@@ -46,12 +49,11 @@ import {useTheme} from '../theme';
 
 const WelcomeScreen: React.FC = () => {
   const dispatch = useDispatch<any>();
-  const {Images} = useTheme();
+  const {Images, Gutters, Layout} = useTheme();
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [leaguesStandings, setLeaguesStandings] = useState<StandingsModel[]>(
     [],
   );
-  const [pickerModalOpen, setPickerModalOpen] = useState(false);
   const {leagues} = useSelector(leaguesSelector);
   const [leaguesModalVisible, setLeaguesModalVisible] =
     useState<boolean>(false);
@@ -62,6 +64,7 @@ const WelcomeScreen: React.FC = () => {
   // const [loadingStandings, setLoadingStandings] = useState<Boolean>(false);
   const [allFixtures, setAllFixtures] = useState<FixtureDataModel[]>([]);
   const [isLoadingLeagues, setIsLoadingLeagues] = useState(false);
+  const [datesViewExapanded, setDatesViewExapanded] = useState(false);
 
   const [selectedOptions, setSelectedOptions] = useState<betOptionModel[] | []>(
     betOptions,
@@ -85,6 +88,8 @@ const WelcomeScreen: React.FC = () => {
   const [toDate, setToDate] = useState(
     new Date(moment().add(2, 'days').format('YYYY-MM-DD')),
   );
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [dateToChange, setDateToChange] = useState<string>();
 
   const [selectedLeagues, setSelectedLeagues] = useState<
     LeagueDataLeagueModel[]
@@ -105,7 +110,9 @@ const WelcomeScreen: React.FC = () => {
     setLeaguesModalVisible(false);
   };
   useEffect(() => {
-    setReadyToFetch(true);
+    if (!__DEV__) {
+      setReadyToFetch(true);
+    }
   }, []);
 
   const closeModal = () => {
@@ -180,6 +187,14 @@ const WelcomeScreen: React.FC = () => {
         standingsTeam2.league.standings[0][0].rank
       );
     });
+  };
+  const handleDateConfirmed = (date: Date) => {
+    if (dateToChange === 'startDate') {
+      setFromDate(new Date(moment(date).format('YYYY-MM-DD')));
+    } else if (dateToChange === 'endDate') {
+      setToDate(new Date(moment(date).format('YYYY-MM-DD')));
+    }
+    setDatePickerVisible(false);
   };
 
   const filterFixtresBetweenDates = (from: Date, to: Date) => {
@@ -259,12 +274,6 @@ const WelcomeScreen: React.FC = () => {
       });
   };
 
-  const onStartDateValueChange = (newValue: any) => {
-    setPickerModalOpen(!pickerModalOpen);
-    const newDate: Date = new Date(newValue);
-    setFromDate(newDate);
-  };
-
   const handleNextClick = async (selectedLeagues_: LeagueDataLeagueModel[]) => {
     let newlyAddedLeagues: LeagueDataLeagueModel[] = [];
     selectedLeagues_.forEach(league_ => {
@@ -308,6 +317,35 @@ const WelcomeScreen: React.FC = () => {
       </View>
 
       <View style={styles.fixtures}>
+        <ListItem.Accordion
+          content={<Text style={Layout.fill}>Select dates</Text>}
+          isExpanded={datesViewExapanded}
+          containerStyle={Gutters.smallHMargin}
+          onPress={() => {
+            setDatesViewExapanded(!datesViewExapanded);
+            console.log('pressed');
+          }}>
+          <View style={styles.datesButtonContainer}>
+            <Button
+              title={`From: ${moment(fromDate).format('DD-MM-YYYY')}`}
+              onPress={() => {
+                setDatePickerVisible(true);
+                setDateToChange('startDate');
+              }}
+              titleProps={{numberOfLines: 1}}
+              containerStyle={{flex: 1, borderRadius: 10, marginRight: 5}}
+            />
+            <Button
+              title={`To: ${moment(toDate).format('DD-MM-YYYY')}`}
+              onPress={() => {
+                setDatePickerVisible(true);
+                setDateToChange('endDate');
+              }}
+              titleProps={{numberOfLines: 1}}
+              containerStyle={{flex: 1, borderRadius: 10}}
+            />
+          </View>
+        </ListItem.Accordion>
         <ListItem.Title style={styles.title}>Predictions</ListItem.Title>
         <Fixtures groupedFixtures={predictedFixtures} />
       </View>
@@ -325,10 +363,8 @@ const WelcomeScreen: React.FC = () => {
               selectedLeagues_.map(league => league.league),
             );
           }}
-          favoriteLeagues={favoriteLeagues}
-          allLeagues={leagues ? leagues : []}
-          // favoriteLeagues={favLeagues}
-          // allLeagues={favLeagues}
+          favoriteLeagues={__DEV__ ? favLeaguesMock : favoriteLeagues}
+          allLeagues={__DEV__ ? favLeaguesMock : leagues ? leagues : []}
           closeActionSheet={closeLeaguesModal}
           initiallySelectedLeagues={[]}
           loading={standingsLoading}
@@ -341,6 +377,12 @@ const WelcomeScreen: React.FC = () => {
         <Dialog.Title title="Fetching leagues" />
         <Dialog.Loading />
       </Dialog>
+      <DateTimePicker
+        isVisible={datePickerVisible}
+        mode="datetime"
+        onConfirm={handleDateConfirmed}
+        onCancel={() => setDatePickerVisible(false)}
+      />
     </ImageBackground>
   );
 };
@@ -359,6 +401,15 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   container: {flex: 1},
+  datesButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft: 5,
+    marginRight: 5,
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    padding: 5,
+  },
   fab: {
     position: 'absolute',
     bottom: '8%',

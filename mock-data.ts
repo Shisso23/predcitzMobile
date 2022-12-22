@@ -1,7 +1,7 @@
 import {FixtureDataModel} from './src/models/fixtures';
 import {LeagueDataModel, LeagueDataSeasonsModel} from './src/models/leagues';
 
-export const favLeagues: LeagueDataModel[] = [
+export const favLeaguesMock: LeagueDataModel[] = [
   new LeagueDataModel({
     country: {
       code: 'ABC',
