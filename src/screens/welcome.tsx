@@ -110,7 +110,7 @@ const WelcomeScreen: React.FC = () => {
     setLeaguesModalVisible(false);
   };
   useEffect(() => {
-    if (!__DEV__) {
+    if (__DEV__) {
       setReadyToFetch(true);
     }
   }, []);
@@ -293,8 +293,9 @@ const WelcomeScreen: React.FC = () => {
           });
         }),
       )
-        .then(standings => {
-          setLeaguesStandings([...leaguesStandings, ...standings]);
+        .then(standingsData => {
+          console.log({standingsData});
+          setLeaguesStandings([...leaguesStandings, ...standingsData]);
         })
         .finally(() => {
           setStandingsLoading(false);
@@ -320,34 +321,64 @@ const WelcomeScreen: React.FC = () => {
         <ListItem.Accordion
           content={<Text style={Layout.fill}>Select dates</Text>}
           isExpanded={datesViewExapanded}
-          containerStyle={Gutters.smallHMargin}
+          containerStyle={Gutters.smallMargin}
           onPress={() => {
             setDatesViewExapanded(!datesViewExapanded);
             console.log('pressed');
           }}>
           <View style={styles.datesButtonContainer}>
             <Button
-              title={`From: ${moment(fromDate).format('DD-MM-YYYY')}`}
+              title={`From: ${moment(fromDate).format('DD-MMM-YYYY')}`}
               onPress={() => {
                 setDatePickerVisible(true);
                 setDateToChange('startDate');
               }}
-              titleProps={{numberOfLines: 1}}
+              titleProps={{numberOfLines: 1, style: styles.dateButtonTitle}}
               containerStyle={{flex: 1, borderRadius: 10, marginRight: 5}}
             />
             <Button
-              title={`To: ${moment(toDate).format('DD-MM-YYYY')}`}
+              title={`To: ${moment(toDate).format('DD-MMM-YYYY')}`}
               onPress={() => {
                 setDatePickerVisible(true);
                 setDateToChange('endDate');
               }}
-              titleProps={{numberOfLines: 1}}
+              titleProps={{numberOfLines: 1, style: styles.dateButtonTitle}}
               containerStyle={{flex: 1, borderRadius: 10}}
             />
           </View>
         </ListItem.Accordion>
-        <ListItem.Title style={styles.title}>Predictions</ListItem.Title>
-        <Fixtures groupedFixtures={predictedFixtures} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignSelf: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginHorizontal: 30,
+          }}>
+          <ListItem.Title style={[styles.title, {marginLeft: '30%'}]}>
+            Predictions
+          </ListItem.Title>
+          <Button
+            containerStyle={{
+              alignSelf: 'flex-end',
+              marginRight: 10,
+              marginBottom: 5,
+            }}
+            titleStyle={{fontSize: 13}}
+            title="Clear fixtures"
+            onPress={() => {
+              setAllFixtures([]);
+              setPredictedFixtures([]);
+              setSelectedLeagues([]);
+            }}
+          />
+        </View>
+
+        <Fixtures
+          groupedFixtures={predictedFixtures}
+          leaguesStandings={leaguesStandings}
+          allFixtures={allFixtures}
+        />
       </View>
       <TouchableOpacity onPress={handleFABPress} style={styles.fab}>
         <Image style={styles.fab} source={Images.plus} />
@@ -381,6 +412,7 @@ const WelcomeScreen: React.FC = () => {
         isVisible={datePickerVisible}
         mode="datetime"
         onConfirm={handleDateConfirmed}
+        date={dateToChange === 'startDate' ? fromDate : toDate}
         onCancel={() => setDatePickerVisible(false)}
       />
     </ImageBackground>
@@ -401,6 +433,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   container: {flex: 1},
+  dateButtonTitle: {fontSize: 11},
   datesButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

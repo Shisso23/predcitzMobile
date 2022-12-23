@@ -4,8 +4,14 @@ import {SafeAreaView, SectionList} from 'react-native';
 import moment from 'moment';
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
+import {Dialog} from '@rneui/themed';
+import {useNavigation} from '@react-navigation/native';
+
 import {FixtureDataModel} from '../../../models/fixtures';
-import {StandingsResponseModel} from '../../../models/standings-models';
+import {
+  StandingsModel,
+  StandingsResponseModel,
+} from '../../../models/standings-models';
 import {StyleSheet} from 'react-native';
 import {useTheme} from '../../../theme';
 import {goupedFixturesMock} from '../../../../mock-data';
@@ -13,6 +19,7 @@ import {Colors} from '../../../theme/Variables';
 import {Button, Image, ListItem} from '@rneui/base';
 import {TouchableOpacity} from 'react-native';
 import {betOptionModel} from '../../../models/bet-option-model/index';
+import {AppStackProps} from '../../../navigation/app/types';
 
 type FixturesProps = {
   groupedFixtures: {
@@ -25,14 +32,22 @@ type FixturesProps = {
       description: string;
     };
   }[];
+  leaguesStandings: StandingsModel[];
+  allFixtures: FixtureDataModel[];
 };
-const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
+const Fixtures: React.FC<FixturesProps> = ({
+  groupedFixtures,
+  leaguesStandings,
+  allFixtures,
+}) => {
   const {Common, Layout, Gutters, Images, Fonts} = useTheme();
   const [selectedItem, setSelectedItem] = useState<FixtureDataModel>();
   const [selectedOption, setSelectedOption] = useState<betOptionModel>();
+  const [standingsModelVisible, setStandingsModelVisible] = useState(false);
   const [favoriteFixtures, setFavoriteFixtures] = useState<
     {fixture: FixtureDataModel; option: betOptionModel}[] | null
   >(null);
+  const navigation = useNavigation<AppStackProps>();
 
   const reformatData = () => {
     const fixtures = __DEV__ ? goupedFixturesMock : groupedFixtures;
@@ -55,7 +70,17 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
         setSelectedItem(item);
         setSelectedOption(option);
       }
+      // setStandingsModelVisible(true);
+      navigation.navigate('fixtureDetails', {
+        leaguesStandings,
+        fixture: item,
+        allFixtures,
+      });
     };
+
+  const closeStandingsModel = () => {
+    setStandingsModelVisible(false);
+  };
 
   const handleAddToFavorite =
     ({
@@ -110,20 +135,24 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
         </View>
         <View
           style={[Layout.rowBetween, Layout.fullWidth, Gutters.smallHMargin]}>
-          <View style={[Layout.row, {width: '47%', justifyContent: 'center'}]}>
+          <View style={[Layout.row, {width: '47%', justifyContent: 'center', alignSelf:'flex-start'}]}>
             <Image
               source={{uri: `${item.teams.home.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
             />
-            <Text numberOfLines={2}>{item.teams.home.name}</Text>
+            <Text numberOfLines={1} style={styles.teamName}>
+              {item.teams.home.name}
+            </Text>
           </View>
           <Text style={[Gutters.regularRMargin, {width: '6%'}]}>Vs</Text>
-          <View style={[Layout.row, {width: '47%', justifyContent: 'center'}]}>
+          <View style={[Layout.row, {width: '47%', justifyContent: 'flex-end', alignSelf:'flex-end', paddingRight: 5}]}>
             <Image
               source={{uri: `${item.teams.away.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
             />
-            <Text numberOfLines={2}>{item.teams.away.name}</Text>
+            <Text numberOfLines={1} style={styles.teamName}>
+              {item.teams.away.name}ƒ
+            </Text>
           </View>
         </View>
         <View style={[Layout.alignItemsCenter, Layout.justifyContentCenter]}>
@@ -135,52 +164,6 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
         </View>
       </View>
     );
-  };
-
-  const renderAccordionButtons = (
-    item: FixtureDataModel,
-    option: betOptionModel,
-  ) => {
-    return (
-      <View style={[Layout.rowBetween, Gutters.smallBMargin]}>
-        <TouchableOpacity
-          onPress={handleAddToFavorite({
-            fixtureData: item,
-            option,
-            action: favoriteFixtures?.some(
-              data =>
-                data.fixture.fixture.id === item?.fixture.id &&
-                data.option.id === option.id,
-            )
-              ? 'remove'
-              : 'add',
-          })}>
-          <Image
-            source={
-              favoriteFixtures?.some(
-                data =>
-                  data.fixture.fixture.id === item?.fixture.id &&
-                  data.option.id === option.id,
-              )
-                ? Images.remove
-                : Images.add
-            }
-            style={[styles.addButton]}
-          />
-        </TouchableOpacity>
-
-        <Button title="View fixture details" />
-      </View>
-    );
-  };
-
-  const sortStandings = (fixtureTeamsStandings: StandingsResponseModel[]) => {
-    return fixtureTeamsStandings.sort((standDingsTeam1, standingsTeam2) => {
-      return (
-        standDingsTeam1.league.standings[0][0].rank -
-        standingsTeam2.league.standings[0][0].rank
-      );
-    });
   };
 
   const renderFixture = ({
@@ -198,10 +181,6 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
   }) => {
     return (
       <ListItem.Accordion
-        isExpanded={
-          selectedItem?.fixture.id === item.fixture.id &&
-          section.option.id === selectedOption?.id
-        }
         key={`${item.fixture.id}-${index}-${section.option.id}`}
         onPress={handleFixtureExpand(item, section.option)}
         ViewComponent={renderFixtureDetail(item)}
@@ -210,11 +189,8 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
           Layout.rowBetween,
           Gutters.smallVMargin,
           styles.fixture,
-        ]}>
-        {selectedItem?.fixture.id === item.fixture.id &&
-          selectedOption?.id === section.option.id &&
-          renderAccordionButtons(item, section.option)}
-      </ListItem.Accordion>
+        ]}
+      />
     );
   };
   const renderEmptyLsitContent = () => {
@@ -232,9 +208,20 @@ const Fixtures: React.FC<FixturesProps> = ({groupedFixtures}) => {
           <Text
             style={styles.header}>{`${title} (${option.description})`}</Text>
         )}
-        contentContainerStyle={styles.sectionList}
+        style={styles.sectionList}
         ListEmptyComponent={renderEmptyLsitContent}
+        ListFooterComponent={<View style={{height: 60}} />}
       />
+
+      <Dialog
+        isVisible={standingsModelVisible}
+        onBackdropPress={closeStandingsModel}
+        presentationStyle="overFullScreen"
+        overlayStyle={styles.standingsModel}>
+        <View style={styles.standingsContainer}>
+          <Text style={{fontWeight: '600', fontSize: 18}}>Standings</Text>
+        </View>
+      </Dialog>
     </SafeAreaView>
   );
 };
@@ -273,12 +260,26 @@ const styles = StyleSheet.create({
   mainContainer: {
     marginLeft: 10,
     marginRight: 10,
-    height: '100%',
+    flexGrow: 1,
   },
   sectionList: {
     width: '100%',
     marginRight: 10,
-    paddingBottom: 150,
+    height: '90%',
+  },
+  standingsModel: {
+    height: '78%',
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+  },
+  standingsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.lightGray,
+  },
+  teamName: {
+    width: '80%',
   },
 });
 
