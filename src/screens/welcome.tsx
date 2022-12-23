@@ -110,7 +110,7 @@ const WelcomeScreen: React.FC = () => {
     setLeaguesModalVisible(false);
   };
   useEffect(() => {
-    if (__DEV__) {
+    if (!__DEV__) {
       setReadyToFetch(true);
     }
   }, []);
