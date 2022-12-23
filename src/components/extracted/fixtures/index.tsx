@@ -135,7 +135,11 @@ const Fixtures: React.FC<FixturesProps> = ({
         </View>
         <View
           style={[Layout.rowBetween, Layout.fullWidth, Gutters.smallHMargin]}>
-          <View style={[Layout.row, {width: '47%', justifyContent: 'center', alignSelf:'flex-start'}]}>
+          <View
+            style={[
+              Layout.row,
+              {width: '47%', justifyContent: 'center', alignSelf: 'flex-start'},
+            ]}>
             <Image
               source={{uri: `${item.teams.home.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
@@ -145,13 +149,22 @@ const Fixtures: React.FC<FixturesProps> = ({
             </Text>
           </View>
           <Text style={[Gutters.regularRMargin, {width: '6%'}]}>Vs</Text>
-          <View style={[Layout.row, {width: '47%', justifyContent: 'flex-end', alignSelf:'flex-end', paddingRight: 5}]}>
+          <View
+            style={[
+              Layout.row,
+              {
+                width: '47%',
+                justifyContent: 'flex-end',
+                alignSelf: 'flex-end',
+                paddingRight: 5,
+              },
+            ]}>
             <Image
               source={{uri: `${item.teams.away.logo}`}}
               style={[styles.logo, Gutters.tinyRMargin]}
             />
             <Text numberOfLines={1} style={styles.teamName}>
-              {item.teams.away.name}ƒ
+              {item.teams.away.name}
             </Text>
           </View>
         </View>
@@ -261,11 +274,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     flexGrow: 1,
+    paddingBottom: 200,
   },
   sectionList: {
     width: '100%',
     marginRight: 10,
     height: '90%',
+    paddingBottom: 100,
   },
   standingsModel: {
     height: '78%',
