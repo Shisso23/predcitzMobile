@@ -14,11 +14,8 @@ const AppContainer: React.FC = () => {
   return (
     <NavigationContainer>
       <RootStack.Navigator screenOptions={{headerShown: false}}>
-        {username.length > 0 ? (
-          <RootStack.Screen name="APP" component={AppNavigator} />
-        ) : (
-          <RootStack.Screen name="AUTH" component={AuthNavigator} />
-        )}
+        <RootStack.Screen name="APP" component={AppNavigator} />
+        {/* <RootStack.Screen name="AUTH" component={AuthNavigator} /> */}
       </RootStack.Navigator>
     </NavigationContainer>
   );

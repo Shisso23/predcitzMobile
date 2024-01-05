@@ -3,6 +3,7 @@ import {FixtureDataModel} from '../../models/fixtures';
 import {StandingsModel} from '../../models/standings-models';
 
 export type AppStackList = {
+  predict: undefined;
   home: undefined;
   thankyou: undefined;
   fixtureDetails: {

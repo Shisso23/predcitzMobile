@@ -340,4 +340,6 @@ export const numberOfSeasonsBack = 3;
 
 export const seasonsBack = [2023, 2022, 2021]; // modify this to work better. SHould not be hardcorded. Adding 2023 in janury gave me issues
 
+export const favoriteLeagueIds: number[] = [39, 78, 144, 218, 61, 135, 190];
+
 //TODO Should make these constants UPPERCASE

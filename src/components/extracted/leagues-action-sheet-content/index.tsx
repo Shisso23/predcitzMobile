@@ -68,7 +68,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
               },
             ]}
             titleStyle={[styles.tabTitle]}
-            title="Favorites"
+            title="Popular leagues"
           />
           <Tab.Item
             style={[

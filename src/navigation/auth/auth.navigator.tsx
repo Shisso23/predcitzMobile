@@ -1,7 +1,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import userInfoScreen from '../../screens/user-info.screen';
+import HomeScreen from '../../screens/Home';
 
 import {AuthStackList} from './types';
 
@@ -12,7 +12,7 @@ const AuthNavigator = () => {
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
       <AuthStack.Screen
         name="auth"
-        component={userInfoScreen}
+        component={HomeScreen}
         options={{
           headerShown: false,
         }}

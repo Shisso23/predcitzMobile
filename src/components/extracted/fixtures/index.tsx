@@ -20,6 +20,8 @@ import {Button, Image, ListItem} from '@rneui/base';
 import {TouchableOpacity} from 'react-native';
 import {betOptionModel} from '../../../models/bet-option-model/index';
 import {AppStackProps} from '../../../navigation/app/types';
+import {useSelector} from 'react-redux';
+import {appSelector} from '../../../reducers/app/app-reducer';
 
 type FixturesProps = {
   groupedFixtures: {
@@ -47,11 +49,13 @@ const Fixtures: React.FC<FixturesProps> = ({
   const [favoriteFixtures, setFavoriteFixtures] = useState<
     {fixture: FixtureDataModel; option: betOptionModel}[] | null
   >(null);
+  const {debugging} = useSelector(appSelector);
   const navigation = useNavigation<AppStackProps>();
 
   const reformatData = () => {
-    // const fixtures = __DEV__ ? goupedFixturesMock : groupedFixtures;
-    const fixtures = groupedFixtures;
+    const fixtures =
+      __DEV__ && debugging ? goupedFixturesMock : groupedFixtures;
+    // const fixtures = groupedFixtures;
     const data = fixtures
       .map(data_ => ({
         title: data_.option.shortName,
@@ -135,11 +139,20 @@ const Fixtures: React.FC<FixturesProps> = ({
           <Text>{`${item.league.name} (${item.league.country})`}</Text>
         </View>
         <View
-          style={[Layout.rowBetween, Layout.fullWidth, Gutters.smallHMargin]}>
+          style={[
+            Layout.rowBetween,
+            Layout.fullWidth,
+            Gutters.smallHMargin,
+            {justifyContent: 'center'},
+          ]}>
           <View
             style={[
               Layout.row,
-              {width: '47%', justifyContent: 'center', alignSelf: 'flex-start'},
+              {
+                width: '47%',
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
             ]}>
             <Image
               source={{uri: `${item.teams.home.logo}`}}
@@ -149,7 +162,16 @@ const Fixtures: React.FC<FixturesProps> = ({
               {item.teams.home.name}
             </Text>
           </View>
-          <Text style={[Gutters.regularRMargin, {width: '6%'}]}>Vs</Text>
+          <Text
+            style={[
+              {
+                width: '6%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+            ]}>
+            Vs
+          </Text>
           <View
             style={[
               Layout.row,
@@ -158,6 +180,7 @@ const Fixtures: React.FC<FixturesProps> = ({
                 justifyContent: 'flex-end',
                 alignSelf: 'flex-end',
                 paddingRight: 5,
+                alignItems: 'center',
               },
             ]}>
             <Image
@@ -254,7 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     alignSelf: 'center',
-    color: Colors.darkGray,
+    color: Colors.black,
     marginTop: '25%',
   },
   fixture: {
