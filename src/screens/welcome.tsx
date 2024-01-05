@@ -109,10 +109,15 @@ const WelcomeScreen: React.FC = () => {
   const closeLeaguesModal = () => {
     setLeaguesModalVisible(false);
   };
+
+  // useEffect(() => {
+  //   if (!__DEV__) {
+  //     setReadyToFetch(true);
+  //   }
+  // }, []);
+
   useEffect(() => {
-    if (!__DEV__) {
-      setReadyToFetch(true);
-    }
+    setReadyToFetch(true);
   }, []);
 
   const closeModal = () => {
@@ -394,8 +399,10 @@ const WelcomeScreen: React.FC = () => {
               selectedLeagues_.map(league => league.league),
             );
           }}
-          favoriteLeagues={__DEV__ ? favLeaguesMock : favoriteLeagues}
-          allLeagues={__DEV__ ? favLeaguesMock : leagues ? leagues : []}
+          // favoriteLeagues={__DEV__ ? favLeaguesMock : favoriteLeagues}
+          favoriteLeagues={favoriteLeagues}
+          // allLeagues={__DEV__ ? favLeaguesMock : leagues ? leagues : []}
+          allLeagues={leagues ? leagues : []}
           closeActionSheet={closeLeaguesModal}
           initiallySelectedLeagues={[]}
           loading={standingsLoading}

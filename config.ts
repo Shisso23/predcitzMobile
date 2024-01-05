@@ -6,3 +6,5 @@ export default {
   apiKey: REACT_APP_API_KEY,
   apiUrl: 'https://api-football-v1.p.rapidapi.com/v3/',
 };
+
+console.log({theKey: REACT_APP_API_KEY});

@@ -8,12 +8,13 @@ import {Image, ListItem} from '@rneui/themed';
 import {StandingsModel} from '../models/standings-models';
 import {FixtureDataModel} from '../models/fixtures';
 import {Colors} from '../theme/Variables';
+
+import moment from 'moment';
 import {
   getH2HFixtures,
-  getLastFiveTeamAwayFixtures,
-  getLastFiveTeamHomeFixtures,
-} from '../helpers/prediction';
-import moment from 'moment';
+  getLastFiveAwayTeamAwayFixtures,
+  getLastFiveHomeTeamHomeFixtures,
+} from '../prediction-functions/shared-functions';
 
 type FixtureDetailsProps = {
   route: {
@@ -40,7 +41,7 @@ const FixtureDetailsScreen: React.FC<FixtureDetailsProps> = ({route}) => {
   const awayTeam = route.params.fixture.teams.away;
   const homeTeamPreviousHomeFixtures = useMemo(
     () =>
-      getLastFiveTeamHomeFixtures({
+      getLastFiveHomeTeamHomeFixtures({
         teamId: homeTeam?.id,
         allFixtures: route.params.allFixtures,
       }),
@@ -48,7 +49,7 @@ const FixtureDetailsScreen: React.FC<FixtureDetailsProps> = ({route}) => {
   );
   const awayTeamPreviousAwayFixtures = useMemo(
     () =>
-      getLastFiveTeamAwayFixtures({
+      getLastFiveAwayTeamAwayFixtures({
         teamId: awayTeam?.id,
         allFixtures: route.params.allFixtures,
       }),

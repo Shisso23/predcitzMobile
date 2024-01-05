@@ -50,7 +50,8 @@ const Fixtures: React.FC<FixturesProps> = ({
   const navigation = useNavigation<AppStackProps>();
 
   const reformatData = () => {
-    const fixtures = __DEV__ ? goupedFixturesMock : groupedFixtures;
+    // const fixtures = __DEV__ ? goupedFixturesMock : groupedFixtures;
+    const fixtures = groupedFixtures;
     const data = fixtures
       .map(data_ => ({
         title: data_.option.shortName,
