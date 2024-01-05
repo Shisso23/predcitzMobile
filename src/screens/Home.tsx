@@ -1,9 +1,5 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-
-import FormScreenContainer from '../components/containers/form-screen-container/form-screen.container';
-import {setUserNameAction} from '../reducers/user/user.actions';
-import AuthForm from '../components/forms/sign-in/auth-form';
 import {
   ImageBackground,
   StyleSheet,
@@ -53,8 +49,20 @@ const HomeScreen: React.FC = () => {
         />
       </View>
       {__DEV__ && (
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', position:'absolute', top:'2%'}}>
-          <Text style={{fontSize: 16, fontWeight: '700', margin: 5, color: Colors.warning}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            position: 'absolute',
+            top: '2%',
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: '700',
+              margin: 5,
+              color: Colors.warning,
+            }}>
             Enable debugging:
           </Text>
           <Switch

@@ -15,6 +15,7 @@ type LeagueyActionSheetContentProps = {
   allLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   initiallySelectedLeagues: LeagueDataModel[];
+  predictedLeagues: LeagueDataModel[];
   loading: boolean;
 };
 
@@ -26,10 +27,15 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
   allLeagues,
   closeActionSheet,
   initiallySelectedLeagues,
+  predictedLeagues,
   loading,
 }) => {
   const {Gutters, Layout, Images} = useTheme();
   const [tabIndex, setTabIndex] = useState<number>(0);
+  console.log('Favourite leagues', favoriteLeagues, {
+    predictedLeagues,
+    allLeagues,
+  });
 
   const handleTabChange = (index: number) => {
     setTabIndex(index);
@@ -88,6 +94,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
           closeActionSheet={closeActionSheet}
           initiallySelectedLeagues={initiallySelectedLeagues}
           favoriteLeagues={favoriteLeagues}
+          predictedLeagues={predictedLeagues}
           showResults={showResults}
           loading={loading}
         />
@@ -96,6 +103,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
           closeActionSheet={closeActionSheet}
           initiallySelectedLeagues={initiallySelectedLeagues}
           allLeagues={allLeagues}
+          predictedLeagues={predictedLeagues}
           showResults={showResults}
           loading={loading}
         />

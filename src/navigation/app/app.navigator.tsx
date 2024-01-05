@@ -13,7 +13,11 @@ const AppNavigator = () => {
   return (
     <AppStack.Navigator screenOptions={{}} initialRouteName="home">
       <AppStack.Screen name="home" component={HomeScreen} />
-      <AppStack.Screen name="predict" component={PredictScreen} />
+      <AppStack.Screen
+        name="predict"
+        component={PredictScreen}
+        options={{headerLeft: () => null}}
+      />
       <AppStack.Screen name="fixtureDetails" component={FixtureDetailsScreen} />
       <AppStack.Screen name="thankyou" component={ThankYouScreen} />
     </AppStack.Navigator>

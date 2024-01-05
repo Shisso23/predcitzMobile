@@ -47,12 +47,17 @@ import BetOptions from '../components/extracted/bet-options';
 import flashService from '../services/flash-service/flash.service';
 import {useTheme} from '../theme';
 import {appSelector} from '../reducers/app/app-reducer';
+import {setSelectedLeaguesAction} from '../reducers/leagues/leagues.actions';
 
 const PredictScreenScreen: React.FC = () => {
   const dispatch = useDispatch<any>();
   const {Images, Gutters, Layout} = useTheme();
+  const selectedLeaguesData = useSelector(leaguesSelector);
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [leaguesStandings, setLeaguesStandings] = useState<StandingsModel[]>(
+    [],
+  );
+  const [predictedLeagues, setPredictedLeagues] = useState<LeagueDataModel[]>(
     [],
   );
   const {leagues} = useSelector(leaguesSelector);
@@ -92,9 +97,6 @@ const PredictScreenScreen: React.FC = () => {
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [dateToChange, setDateToChange] = useState<string>();
 
-  const [selectedLeagues, setSelectedLeagues] = useState<
-    LeagueDataLeagueModel[]
-  >([]);
   const [favoriteLeagues, setFavoriteLeagues] = useState([]);
   const [readyToFetch, setReadyToFetch] = useState(false);
   const {debugging} = useSelector(appSelector);
@@ -117,10 +119,6 @@ const PredictScreenScreen: React.FC = () => {
       setReadyToFetch(true);
     }
   }, []);
-
-  // useEffect(() => {
-  //   setReadyToFetch(true);
-  // }, []);
 
   const closeModal = () => {
     setIsLoadingLeagues(false);
@@ -150,6 +148,7 @@ const PredictScreenScreen: React.FC = () => {
         .then(response => {
           dispatch(setLeagues(response.data.response));
           setFavoriteLeagues(getFavoriteLeagues(response.data.response));
+          flashService.success('Successfully fetched leagues!');
         })
         .catch(() => {
           flashService.error('Could not fetch leagues!');
@@ -165,20 +164,25 @@ const PredictScreenScreen: React.FC = () => {
     console.log({futureFixtures});
   }, [futureFixtures?.length]);
 
-  useEffect(() => {
+  const fetchFixtures = () => {
     let leagueToFetchFixturesFor: LeagueDataLeagueModel[] = [];
-    selectedLeagues.forEach(league => {
+    selectedLeaguesData.selectedLeagues.forEach((league: LeagueDataModel) => {
       if (
         allFixtures.length > 0 &&
-        allFixtures.some(fixtureData => fixtureData.league.id === league.id)
+        allFixtures.some(
+          fixtureData => fixtureData.league.id === league.league.id,
+        )
       ) {
       } else {
-        leagueToFetchFixturesFor = [...leagueToFetchFixturesFor, league];
+        leagueToFetchFixturesFor = [...leagueToFetchFixturesFor, league.league];
       }
     });
-
+    setPredictedLeagues([
+      ...predictedLeagues,
+      ...selectedLeaguesData.selectedLeagues,
+    ]);
     fetchLeaguesSeasonsFixtures(leagueToFetchFixturesFor);
-  }, [JSON.stringify(selectedLeagues)]);
+  };
 
   const predict = () => {
     const predictions = selectedOptions.map((option: betOptionModel) =>
@@ -281,33 +285,24 @@ const PredictScreenScreen: React.FC = () => {
       });
   };
 
-  const handleNextClick = async (selectedLeagues_: LeagueDataLeagueModel[]) => {
-    let newlyAddedLeagues: LeagueDataLeagueModel[] = [];
-    selectedLeagues_.forEach(league_ => {
-      if (selectedLeagues.some(league => league.id === league_.id)) {
-      } else {
-        newlyAddedLeagues = [...newlyAddedLeagues, league_];
-      }
-    });
-    if (newlyAddedLeagues.length > 0) {
-      setStandingsLoading(true);
-      setSelectedLeagues([...selectedLeagues, ...newlyAddedLeagues]);
-      return Promise.all(
-        newlyAddedLeagues.map(league => {
-          return getStandingsByLeagueId({
-            leagueId: league.id,
-            season: seasonsBack[0],
-          });
-        }),
-      )
-        .then(standingsData => {
-          console.log({standingsData});
-          setLeaguesStandings([...leaguesStandings, ...standingsData]);
-        })
-        .finally(() => {
-          setStandingsLoading(false);
+  const handleNextClick = async () => {
+    setStandingsLoading(true);
+    fetchFixtures();
+    return Promise.all(
+      selectedLeaguesData.selectedLeagues.map((league: LeagueDataModel) => {
+        return getStandingsByLeagueId({
+          leagueId: league.league.id,
+          season: seasonsBack[0],
         });
-    }
+      }),
+    )
+      .then(standingsData => {
+        setLeaguesStandings([...leaguesStandings, ...standingsData]);
+        dispatch(setSelectedLeaguesAction([]));
+      })
+      .finally(() => {
+        setStandingsLoading(false);
+      });
   };
 
   const handleSelectedOptions = (options: betOptionModel[]) => {
@@ -376,7 +371,8 @@ const PredictScreenScreen: React.FC = () => {
             onPress={() => {
               setAllFixtures([]);
               setPredictedFixtures([]);
-              setSelectedLeagues([]);
+              setPredictedLeagues([]);
+              dispatch(setSelectedLeaguesAction([]));
             }}
           />
         </View>
@@ -396,21 +392,18 @@ const PredictScreenScreen: React.FC = () => {
         presentationStyle="overFullScreen"
         overlayStyle={styles.overlay}>
         <LeagueActionSheetContent
-          showResults={async (selectedLeagues_: LeagueDataModel[]) => {
-            await handleNextClick(
-              selectedLeagues_.map(league => league.league),
-            );
+          showResults={async () => {
+            await handleNextClick();
           }}
           favoriteLeagues={
             __DEV__ && debugging ? favLeaguesMock : favoriteLeagues
           }
-          // favoriteLeagues={favoriteLeagues}
           allLeagues={
             __DEV__ && debugging ? favLeaguesMock : leagues ? leagues : []
           }
-          // allLeagues={leagues ? leagues : []}
           closeActionSheet={closeLeaguesModal}
-          initiallySelectedLeagues={[]}
+          initiallySelectedLeagues={selectedLeaguesData.selectedLeagues}
+          predictedLeagues={predictedLeagues}
           loading={standingsLoading}
         />
       </Dialog>

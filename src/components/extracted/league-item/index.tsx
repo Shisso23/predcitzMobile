@@ -11,9 +11,15 @@ type LeagueItemProps = {
   onPress: Function;
   item: LeagueDataModel;
   selected: boolean;
+  disabled: boolean;
 };
 
-const LeagueItem: React.FC<LeagueItemProps> = ({onPress, item, selected}) => {
+const LeagueItem: React.FC<LeagueItemProps> = ({
+  onPress,
+  item,
+  selected,
+  disabled,
+}) => {
   const [isSelected, setIsSelected] = useState(selected);
   const {Gutters} = useTheme();
 
@@ -32,9 +38,17 @@ const LeagueItem: React.FC<LeagueItemProps> = ({onPress, item, selected}) => {
         Gutters.tinyMargin,
         Gutters.regularPadding,
         styles.container,
-        {backgroundColor: isSelected ? Colors.secondary : Colors.lightGray},
+        {
+          backgroundColor: disabled
+            ? Colors.secondary
+            : isSelected
+            ? Colors.secondary
+            : Colors.lightGray,
+          opacity: disabled ? 0.5 : 1,
+        },
       ]}
       key={`${item.league.id}`}
+      disabled={disabled}
       onPress={handleSelect}>
       <ListItem.Subtitle
         numberOfLines={2}

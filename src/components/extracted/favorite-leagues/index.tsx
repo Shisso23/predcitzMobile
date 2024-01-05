@@ -1,15 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {Button} from '@rneui/base';
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, SafeAreaView, View, FlatList} from 'react-native';
 import {LeagueDataModel} from '../../../models/leagues';
 import {useTheme} from '../../../theme';
 import {Colors} from '../../../theme/Variables';
 import LeagueItem from '../league-item';
+import {useDispatch, useSelector} from 'react-redux';
+import {setSelectedLeaguesAction} from '../../../reducers/leagues/leagues.actions';
+import {leaguesSelector} from '../../../reducers/leagues/leagues.reducer';
 
 type FavoriteLeaguesProps = {
   showResults: Function;
   favoriteLeagues: LeagueDataModel[];
   initiallySelectedLeagues: LeagueDataModel[];
+  predictedLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   loading: boolean;
 };
@@ -17,31 +22,33 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
   favoriteLeagues,
   showResults,
   initiallySelectedLeagues,
+  predictedLeagues,
   loading,
   closeActionSheet,
 }) => {
   const {Common, Layout, Gutters} = useTheme();
-  const [selectedLeagues, setSelectedLeagues] = useState<LeagueDataModel[]>(
-    initiallySelectedLeagues,
-  );
-
+  const dispatch = useDispatch<any>();
+  const {selectedLeagues} = useSelector(leaguesSelector);
   const clearLeagues = () => {
-    setSelectedLeagues([]);
+    dispatch(setSelectedLeaguesAction([]));
   };
 
   const handleLeagueSelect = (league_: LeagueDataModel, selected: boolean) => {
     if (selectedLeagues) {
       if (selected) {
-        setSelectedLeagues([...selectedLeagues, league_]);
+        dispatch(setSelectedLeaguesAction([...selectedLeagues, league_]));
       } else if (!selected) {
-        setSelectedLeagues(
-          selectedLeagues.filter(
-            league => league.league.id !== league_.league.id,
+        dispatch(
+          setSelectedLeaguesAction(
+            selectedLeagues.filter(
+              (league: LeagueDataModel) =>
+                league.league.id !== league_.league.id,
+            ),
           ),
         );
       }
     } else {
-      setSelectedLeagues([league_]);
+      dispatch(setSelectedLeaguesAction([league_]));
     }
   };
 
@@ -82,6 +89,9 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
         onPress={(selected: boolean) => {
           handleLeagueSelect(item, selected);
         }}
+        disabled={predictedLeagues.some(
+          leagueData => leagueData.league.id === item.league.id,
+        )}
         selected={initiallySelectedLeagues?.some(league => {
           return `${league.league.id}` === `${item.league.id}`;
         })}

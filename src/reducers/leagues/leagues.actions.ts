@@ -1,6 +1,10 @@
-import {setLeagues, setIsLoadingLeagues} from './leagues.reducer';
+import {
+  setLeagues,
+  setIsLoadingLeagues,
+  setSelectedLeagues,
+} from './leagues.reducer';
 import leauesService from '../../services/leagues';
-import {LeaguesFilterModel} from '../../models/leagues';
+import {LeagueDataModel, LeaguesFilterModel} from '../../models/leagues';
 
 export const geFilteredLeaguesAction =
   async (filters: LeaguesFilterModel) => async (dispatch: Function) => {
@@ -14,4 +18,9 @@ export const geFilteredLeaguesAction =
       .finally(() => {
         dispatch(setIsLoadingLeagues(false));
       });
+  };
+
+export const setSelectedLeaguesAction =
+  async (selectedLeagues: LeagueDataModel[]) => async (dispatch: Function) => {
+    return dispatch(setSelectedLeagues(selectedLeagues));
   };

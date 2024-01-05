@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Button, Image, Input} from '@rneui/base';
@@ -8,11 +9,15 @@ import {useTheme} from '../../../theme';
 import {Colors} from '../../../theme/Variables';
 import LeagueItem from '../league-item';
 import {FormScreenContainer} from '../../containers';
+import {useDispatch, useSelector} from 'react-redux';
+import {setSelectedLeaguesAction} from '../../../reducers/leagues/leagues.actions';
+import {leaguesSelector} from '../../../reducers/leagues/leagues.reducer';
 
 type SearchLeaguesProps = {
   showResults: Function;
   allLeagues: LeagueDataModel[];
   initiallySelectedLeagues: LeagueDataModel[];
+  predictedLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   loading: boolean;
 };
@@ -20,35 +25,38 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   allLeagues,
   showResults,
   initiallySelectedLeagues,
+  predictedLeagues,
   loading,
   closeActionSheet,
 }) => {
   const {Common, Layout, Gutters, Images} = useTheme();
-  const [selectedLeagues, setSelectedLeagues] = useState<LeagueDataModel[]>(
-    initiallySelectedLeagues,
-  );
+  const dispatch = useDispatch<any>();
+  const {selectedLeagues} = useSelector(leaguesSelector);
   const [searchedLeagues, setSearchedLeagues] = useState<
     LeagueDataModel[] | []
   >([]);
   const [searchKeyWord, setSearchKeyWord] = useState<string>();
 
   const clearLeagues = () => {
-    setSelectedLeagues([]);
+    dispatch(setSelectedLeaguesAction([]));
   };
 
   const handleLeagueSelect = (league_: LeagueDataModel, selected: boolean) => {
     if (selectedLeagues) {
       if (selected) {
-        setSelectedLeagues([...selectedLeagues, league_]);
+        dispatch(setSelectedLeaguesAction([...selectedLeagues, league_]));
       } else if (!selected) {
-        setSelectedLeagues(
-          selectedLeagues.filter(
-            league => league.league.id !== league_.league.id,
+        dispatch(
+          setSelectedLeaguesAction(
+            selectedLeagues.filter(
+              (league: LeagueDataModel) =>
+                league.league.id !== league_.league.id,
+            ),
           ),
         );
       }
     } else {
-      setSelectedLeagues([league_]);
+      dispatch(setSelectedLeaguesAction([league_]));
     }
   };
   const clearSearch = () => () => {
@@ -138,6 +146,9 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
         onPress={(selected: boolean) => {
           handleLeagueSelect(item, selected);
         }}
+        disabled={predictedLeagues.some(
+          leagueData => leagueData.league.id === item.league.id,
+        )}
         selected={initiallySelectedLeagues?.some(league => {
           return `${league.league.id}` === `${item.league.id}`;
         })}

@@ -8,16 +8,12 @@ import {Dialog} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 
 import {FixtureDataModel} from '../../../models/fixtures';
-import {
-  StandingsModel,
-  StandingsResponseModel,
-} from '../../../models/standings-models';
+import {StandingsModel} from '../../../models/standings-models';
 import {StyleSheet} from 'react-native';
 import {useTheme} from '../../../theme';
 import {goupedFixturesMock} from '../../../../mock-data';
 import {Colors} from '../../../theme/Variables';
-import {Button, Image, ListItem} from '@rneui/base';
-import {TouchableOpacity} from 'react-native';
+import {Image, ListItem} from '@rneui/base';
 import {betOptionModel} from '../../../models/bet-option-model/index';
 import {AppStackProps} from '../../../navigation/app/types';
 import {useSelector} from 'react-redux';
@@ -143,14 +139,14 @@ const Fixtures: React.FC<FixturesProps> = ({
             Layout.rowBetween,
             Layout.fullWidth,
             Gutters.smallHMargin,
-            {justifyContent: 'center'},
+            {justifyContent: 'center', paddingHorizontal: '5%'},
           ]}>
           <View
             style={[
               Layout.row,
               {
-                width: '47%',
-                justifyContent: 'center',
+                width: '45%',
+                justifyContent: 'flex-end',
                 alignItems: 'center',
               },
             ]}>
@@ -162,23 +158,28 @@ const Fixtures: React.FC<FixturesProps> = ({
               {item.teams.home.name}
             </Text>
           </View>
-          <Text
-            style={[
-              {
-                width: '6%',
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-            ]}>
-            Vs
-          </Text>
+          <View
+            style={{
+              width: '10%',
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={[
+                {
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                },
+              ]}>
+              Vs
+            </Text>
+          </View>
+
           <View
             style={[
               Layout.row,
               {
-                width: '47%',
-                justifyContent: 'flex-end',
-                alignSelf: 'flex-end',
+                width: '45%',
+                alignSelf: 'center',
                 paddingRight: 5,
                 alignItems: 'center',
               },
@@ -232,7 +233,7 @@ const Fixtures: React.FC<FixturesProps> = ({
   };
   const renderEmptyLsitContent = () => {
     return (
-      <Text style={styles.emptyList}>Select leagues to see predictions.</Text>
+      <Text style={styles.emptyList}>Add leagues to see predictions.</Text>
     );
   };
 
@@ -277,8 +278,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     alignSelf: 'center',
-    color: Colors.black,
-    marginTop: '25%',
+    color: Colors.white,
+    marginTop: '50%',
   },
   fixture: {
     height: 90,
