@@ -1,9 +1,10 @@
-import { betOptionsEnum } from "../enums/bet-options.enums";
-import { betOptionModel } from "../models/bet-option-model";
-import { FixtureDataModel } from "../models/fixtures";
-import { StandingsDataStandingModel, StandingsModel } from "../models/standings-models";
-import { betOptions } from "../data-config/data-config";
-import { getLastFiveHomeTeamHomeFixtures, againstAwayTeamGoalsPercentage, homeTeamGoalsPercentage, awayTeamGoalsPercentage, againstHomeTeamGoalsPercentage, homeTeamWinsMostMatches, otherHomeTeamGoalsInAwayFixtures, awayTeamFailWinningInMostAwayFixtures, HomeTeamScroreInMostHomeFixtures, getAwayTeamStanding, getHomeTeamStanding, getLastFiveAwayTeamAwayFixtures, getH2HFixtures, getLastFiveTeamFixtures, teamDidNotWinLastFixture, awayTeamFailScroringInMostAwayFixtures, teamDidNotLoseLastFixture, goodHomeTeamwinPercentage } from "./shared-functions";
+/* eslint-disable prettier/prettier */
+import { betOptionsEnum } from '../enums/bet-options.enums';
+import { betOptionModel } from '../models/bet-option-model';
+import { FixtureDataModel } from '../models/fixtures';
+import { StandingsDataStandingModel, StandingsModel } from '../models/standings-models';
+import { betOptions } from '../data-config/data-config';
+import { getLastFiveHomeTeamHomeFixtures, againstAwayTeamGoalsPercentage, homeTeamGoalsPercentage, awayTeamGoalsPercentage, againstHomeTeamGoalsPercentage, homeTeamWinsMostMatches, otherHomeTeamGoalsInAwayFixtures, awayTeamFailWinningInMostAwayFixtures, HomeTeamScroreInMostHomeFixtures, getAwayTeamStanding, getHomeTeamStanding, getLastFiveAwayTeamAwayFixtures, getH2HFixtures, getLastFiveTeamFixtures, teamDidNotWinLastFixture, awayTeamFailScroringInMostAwayFixtures, teamDidNotLoseLastFixture, goodHomeTeamwinPercentage } from './shared-functions';
 
 export const predictHomeWin = ({
     currentFixtures,
@@ -36,16 +37,16 @@ export const predictHomeWin = ({
       const awayTeamStanding: StandingsDataStandingModel = getAwayTeamStanding({
         standings: leaguesStandings,
         awayTeamId: currentFixture.teams.away.id,
-        leagueId: currentFixture.league.id, 
+        leagueId: currentFixture.league.id,
       });
 
-      const lastHomeTeamMatches = getLastFiveTeamFixtures({allFixtures, teamId: currentFixture.teams.home.id})
-      const lastAwayTeamMatches = getLastFiveTeamFixtures({allFixtures, teamId: currentFixture.teams.away.id})
+      const lastHomeTeamMatches = getLastFiveTeamFixtures({allFixtures, teamId: currentFixture.teams.home.id});
+      const lastAwayTeamMatches = getLastFiveTeamFixtures({allFixtures, teamId: currentFixture.teams.away.id});
 
-      if ( homeTeamStanding && awayTeamStanding && lastFiveHomeTeamHomeFixtures.length >= 3 && homeTeamStanding.all.played>=3) {
-        return  ((homeTeamStanding.rank <=4 && Math.abs(homeTeamStanding.rank - awayTeamStanding.rank)> 5 && homeTeamWinsMostMatches({fixtures: lastFiveHomeTeamHomeFixtures, homeTeamId: lastFiveHomeTeamHomeFixtures[0].teams.home.id}) )&& 
-       (homeTeamStanding.points - awayTeamStanding.points)>5 && 
-      ( awayTeamFailWinningInMostAwayFixtures({awayFixtures: lastFiveAwayTeamAwayFixtures})) ) || goodHomeTeamwinPercentage({awayStanding: awayTeamStanding, homeStanding: homeTeamStanding, lossPercentage: 70, winPercentage: 70})
+      if ( homeTeamStanding && awayTeamStanding && lastFiveHomeTeamHomeFixtures.length >= 3 && homeTeamStanding.all.played >= 3) {
+        return  ((homeTeamStanding.rank <= 4 && Math.abs(homeTeamStanding.rank - awayTeamStanding.rank) > 9 && homeTeamWinsMostMatches({fixtures: lastFiveHomeTeamHomeFixtures, homeTeamId: lastFiveHomeTeamHomeFixtures[0].teams.home.id}) ) &&
+       (homeTeamStanding.points - awayTeamStanding.points) > 5 &&
+      ( awayTeamFailWinningInMostAwayFixtures({awayFixtures: lastFiveAwayTeamAwayFixtures})) ) || (goodHomeTeamwinPercentage({awayStanding: awayTeamStanding, homeStanding: homeTeamStanding, lossPercentage: 70, winPercentage: 70}) && Math.abs(homeTeamStanding.rank - awayTeamStanding.rank) > 9);
       }
       return false;
     });

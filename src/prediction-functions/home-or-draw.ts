@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { betOptionsEnum } from "../enums/bet-options.enums";
 import { betOptionModel } from "../models/bet-option-model";
 import { FixtureDataModel } from "../models/fixtures";
@@ -35,9 +36,9 @@ export const predictHomeOrDraw = ({
       });
      
       if ( homeTeamStanding && awayTeamStanding && lastFiveHomeTeamHomeFixtures.length >= 3 && homeTeamStanding.all.played>=3) {
-        return  ((homeTeamStanding.rank <=6 && Math.abs(homeTeamStanding.rank - awayTeamStanding.rank)> 5 && homeTeamWinsMostMatches({fixtures: lastFiveHomeTeamHomeFixtures, homeTeamId: lastFiveHomeTeamHomeFixtures[0].teams.home.id}) )&& 
+        return  ((homeTeamStanding.rank <=6 && Math.abs(homeTeamStanding.rank - awayTeamStanding.rank)> 10 && homeTeamWinsMostMatches({fixtures: lastFiveHomeTeamHomeFixtures, homeTeamId: lastFiveHomeTeamHomeFixtures[0].teams.home.id}) )&& 
         (homeTeamStanding.points - awayTeamStanding.points)>5 && 
-       ( awayTeamFailWinningInMostAwayFixtures({awayFixtures: lastFiveAwayTeamAwayFixtures})) ) || goodHomeTeamwinPercentage({awayStanding: awayTeamStanding, homeStanding: homeTeamStanding, lossPercentage: 50, winPercentage: 60})
+       ( awayTeamFailWinningInMostAwayFixtures({awayFixtures: lastFiveAwayTeamAwayFixtures})) ) ||( goodHomeTeamwinPercentage({awayStanding: awayTeamStanding, homeStanding: homeTeamStanding, lossPercentage: 50, winPercentage: 60})&& Math.abs(homeTeamStanding.rank - awayTeamStanding.rank)> 8 )
       }
       return false;
 
