@@ -177,10 +177,7 @@ const PredictScreenScreen: React.FC = () => {
         leagueToFetchFixturesFor = [...leagueToFetchFixturesFor, league.league];
       }
     });
-    setPredictedLeagues([
-      ...predictedLeagues,
-      ...selectedLeaguesData.selectedLeagues,
-    ]);
+
     fetchLeaguesSeasonsFixtures(leagueToFetchFixturesFor);
   };
 
@@ -276,8 +273,13 @@ const PredictScreenScreen: React.FC = () => {
               return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
             }),
           );
+          setPredictedLeagues([
+            ...predictedLeagues,
+            ...selectedLeaguesData.selectedLeagues,
+          ]);
           setAllFixtures([...allFixtures, ...allSortedFixtures]);
           setFutureFixtures([...futureFixtures, ...futureSortedFixtures]);
+          setToDate(new Date(moment(toDate).subtract(1).format('YYYY-MM-DD')));
         }
       })
       .finally(() => {
@@ -288,7 +290,6 @@ const PredictScreenScreen: React.FC = () => {
   const handleNextClick = async () => {
     setStandingsLoading(true);
     fetchFixtures();
-    predict();
     return Promise.all(
       selectedLeaguesData.selectedLeagues.map((league: LeagueDataModel) => {
         return getStandingsByLeagueId({
@@ -298,8 +299,12 @@ const PredictScreenScreen: React.FC = () => {
       }),
     )
       .then(standingsData => {
+        flashService.success('Successfully fetched standings@');
         setLeaguesStandings([...leaguesStandings, ...standingsData]);
         dispatch(setSelectedLeaguesAction([]));
+      })
+      .catch(() => {
+        flashService.error('Failed fetching standings!');
       })
       .finally(() => {
         setStandingsLoading(false);
