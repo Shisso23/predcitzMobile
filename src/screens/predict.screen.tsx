@@ -288,6 +288,7 @@ const PredictScreenScreen: React.FC = () => {
   const handleNextClick = async () => {
     setStandingsLoading(true);
     fetchFixtures();
+    predict();
     return Promise.all(
       selectedLeaguesData.selectedLeagues.map((league: LeagueDataModel) => {
         return getStandingsByLeagueId({
@@ -416,7 +417,7 @@ const PredictScreenScreen: React.FC = () => {
       </Dialog>
       <DateTimePicker
         isVisible={datePickerVisible}
-        mode="datetime"
+        mode="date"
         onConfirm={handleDateConfirmed}
         date={dateToChange === 'startDate' ? fromDate : toDate}
         onCancel={() => setDatePickerVisible(false)}
