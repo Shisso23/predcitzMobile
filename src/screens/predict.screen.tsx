@@ -141,7 +141,7 @@ const PredictScreenScreen: React.FC = () => {
   }, [selectedOptions.length]);
 
   useEffect(() => {
-    if (readyToFetch) {
+    if (readyToFetch && !leagues) {
       setIsLoadingLeagues(true);
       leaguesService
         .getFilteredLeagues(leaguesFilters)
@@ -156,6 +156,10 @@ const PredictScreenScreen: React.FC = () => {
         .finally(() => {
           setIsLoadingLeagues(false);
         });
+    }
+    if (leagues) {
+      setFavoriteLeagues(getFavoriteLeagues(leagues));
+      flashService.success('Successfully retrieved cached leagues!');
     }
   }, [readyToFetch]);
 
@@ -376,6 +380,7 @@ const PredictScreenScreen: React.FC = () => {
             title="Clear fixtures"
             onPress={() => {
               setAllFixtures([]);
+              setCurrentFixtures([]);
               setPredictedFixtures([]);
               setPredictedLeagues([]);
               dispatch(setSelectedLeaguesAction([]));

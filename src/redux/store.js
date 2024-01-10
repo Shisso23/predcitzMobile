@@ -1,9 +1,7 @@
-import {createStore, applyMiddleware} from 'redux';
 import {configureStore} from '@reduxjs/toolkit';
 import ReduxThunk from 'redux-thunk';
 import ReduxPromise from 'redux-promise';
-
-import reducers from '../reducers/root.reducer';
+import {persistedReducer} from '../redux/configureStore';
 
 const middleware = [ReduxThunk, ReduxPromise];
 
@@ -11,6 +9,6 @@ const middleware = [ReduxThunk, ReduxPromise];
 // export default createStore(reducers, applyMiddleware(ReduxThunk));
 
 export default configureStore({
-  reducer: reducers,
+  reducer: persistedReducer,
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middleware),
 });
