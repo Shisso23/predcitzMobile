@@ -5,12 +5,14 @@ export interface LeaguesState {
   leagues: LeaguesModel | null;
   isLoadingLeagues: Boolean;
   selectedLeagues: LeagueDataModel[];
+  predictedLeagues: LeagueDataModel[];
 }
 
 const initialState: LeaguesState = {
   leagues: null,
   isLoadingLeagues: false,
   selectedLeagues: [],
+  predictedLeagues: [],
 };
 
 export const leaguesSlice = createSlice({
@@ -26,11 +28,18 @@ export const leaguesSlice = createSlice({
     setIsLoadingLeagues: (state, action: PayloadAction<Boolean>) => {
       state.isLoadingLeagues = action.payload;
     },
+    setPredictedleagues: (state, action: PayloadAction<LeagueDataModel[]>) => {
+      state.predictedLeagues = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {setLeagues, setIsLoadingLeagues, setSelectedLeagues} =
-  leaguesSlice.actions;
+export const {
+  setLeagues,
+  setIsLoadingLeagues,
+  setSelectedLeagues,
+  setPredictedleagues,
+} = leaguesSlice.actions;
 export const leaguesSelector = (reducers: any) => reducers.leaguesReducer;
 export default leaguesSlice.reducer;

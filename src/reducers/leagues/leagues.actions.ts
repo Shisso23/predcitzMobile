@@ -2,6 +2,7 @@ import {
   setLeagues,
   setIsLoadingLeagues,
   setSelectedLeagues,
+  setPredictedleagues,
 } from './leagues.reducer';
 import leauesService from '../../services/leagues';
 import {LeagueDataModel, LeaguesFilterModel} from '../../models/leagues';
@@ -23,4 +24,9 @@ export const geFilteredLeaguesAction =
 export const setSelectedLeaguesAction =
   async (selectedLeagues: LeagueDataModel[]) => async (dispatch: Function) => {
     return dispatch(setSelectedLeagues(selectedLeagues));
+  };
+
+export const setPredictedLeaguesAction =
+  (predictedLeagues: LeagueDataModel[]) => (dispatch: Function) => {
+    dispatch(setPredictedleagues(predictedLeagues));
   };

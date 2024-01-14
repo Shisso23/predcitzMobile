@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { betOptionsEnum } from "../enums/bet-options.enums";
 import { betOptionModel } from "../models/bet-option-model";
 import { FixtureDataModel } from "../models/fixtures";

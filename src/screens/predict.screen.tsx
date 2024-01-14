@@ -29,10 +29,7 @@ import {
 } from '../data-config/data-config';
 import {LeagueDataModel} from '../models/leagues/index';
 import {getStandingsByLeagueId} from '../services/standings';
-import {
-  StandingsModel,
-  StandingsResponseModel,
-} from '../models/standings-models';
+import {StandingsResponseModel} from '../models/standings-models';
 import {favLeaguesMock} from '../../mock-data';
 import {getFilteredFixtures} from '../services/fixtures';
 import {
@@ -47,19 +44,26 @@ import BetOptions from '../components/extracted/bet-options';
 import flashService from '../services/flash-service/flash.service';
 import {useTheme} from '../theme';
 import {appSelector} from '../reducers/app/app-reducer';
-import {setSelectedLeaguesAction} from '../reducers/leagues/leagues.actions';
+import {
+  setPredictedLeaguesAction,
+  setSelectedLeaguesAction,
+} from '../reducers/leagues/leagues.actions';
+import {
+  setAllFixturesAction,
+  setPredictedFixturesAction,
+} from '../reducers/fixtures/fixtures.actions';
+import {fixturesSelector} from '../reducers/fixtures/fixtures.reducer';
+import {setStandingsAction} from '../reducers/standings/standings.actions';
+import {standingsSelector} from '../reducers/standings/standings.reducer';
 
 const PredictScreenScreen: React.FC = () => {
   const dispatch = useDispatch<any>();
   const {Images, Gutters, Layout} = useTheme();
   const selectedLeaguesData = useSelector(leaguesSelector);
+  const {predictedFixtures, allFixtures} = useSelector(fixturesSelector);
   const [standingsLoading, setStandingsLoading] = useState(false);
-  const [leaguesStandings, setLeaguesStandings] = useState<StandingsModel[]>(
-    [],
-  );
-  const [predictedLeagues, setPredictedLeagues] = useState<LeagueDataModel[]>(
-    [],
-  );
+  const {leaguesStandings} = useSelector(standingsSelector);
+  const {predictedLeagues} = useSelector(leaguesSelector);
   const {leagues} = useSelector(leaguesSelector);
   const [leaguesModalVisible, setLeaguesModalVisible] =
     useState<boolean>(false);
@@ -68,25 +72,14 @@ const PredictScreenScreen: React.FC = () => {
     [],
   );
   // const [loadingStandings, setLoadingStandings] = useState<Boolean>(false);
-  const [allFixtures, setAllFixtures] = useState<FixtureDataModel[]>([]);
+
   const [isLoadingLeagues, setIsLoadingLeagues] = useState(false);
   const [datesViewExapanded, setDatesViewExapanded] = useState(false);
 
   const [selectedOptions, setSelectedOptions] = useState<betOptionModel[] | []>(
     betOptions,
   );
-  const [predictedFixtures, setPredictedFixtures] = useState<
-    {
-      fixtures: FixtureDataModel[];
-      option: {
-        name: String;
-        id: number;
-        level: number;
-        shortName: String;
-        description: string;
-      };
-    }[]
-  >([]);
+
   const [fromDate, setFromDate] = useState(
     new Date(moment().subtract(0, 'days').format('YYYY-MM-DD')),
   );
@@ -174,7 +167,8 @@ const PredictScreenScreen: React.FC = () => {
       if (
         allFixtures.length > 0 &&
         allFixtures.some(
-          fixtureData => fixtureData.league.id === league.league.id,
+          (fixtureData: FixtureDataModel) =>
+            fixtureData.league.id === league.league.id,
         )
       ) {
       } else {
@@ -189,7 +183,7 @@ const PredictScreenScreen: React.FC = () => {
     const predictions = selectedOptions.map((option: betOptionModel) =>
       option.predict({currentFixtures, allFixtures, leaguesStandings}),
     );
-    setPredictedFixtures(predictions);
+    dispatch(setPredictedFixturesAction(predictions));
   };
 
   const sortStandings = (fixtureTeamsStandings: StandingsResponseModel[]) => {
@@ -277,11 +271,15 @@ const PredictScreenScreen: React.FC = () => {
               return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
             }),
           );
-          setPredictedLeagues([
-            ...predictedLeagues,
-            ...selectedLeaguesData.selectedLeagues,
-          ]);
-          setAllFixtures([...allFixtures, ...allSortedFixtures]);
+          dispatch(
+            setPredictedLeaguesAction([
+              ...predictedLeagues,
+              ...selectedLeaguesData.selectedLeagues,
+            ]),
+          );
+          dispatch(
+            setAllFixturesAction([...allFixtures, ...allSortedFixtures]),
+          );
           setFutureFixtures([...futureFixtures, ...futureSortedFixtures]);
           setToDate(new Date(moment(toDate).subtract(1).format('YYYY-MM-DD')));
         }
@@ -298,13 +296,13 @@ const PredictScreenScreen: React.FC = () => {
       selectedLeaguesData.selectedLeagues.map((league: LeagueDataModel) => {
         return getStandingsByLeagueId({
           leagueId: league.league.id,
-          season: seasonsBack[0],
+          season: seasonsBack[0], //TODO change to current season
         });
       }),
     )
       .then(standingsData => {
-        flashService.success('Successfully fetched standings@');
-        setLeaguesStandings([...leaguesStandings, ...standingsData]);
+        flashService.success('Successfully fetched standings!');
+        dispatch(setStandingsAction([...leaguesStandings, ...standingsData]));
         dispatch(setSelectedLeaguesAction([]));
       })
       .catch(() => {
@@ -379,10 +377,10 @@ const PredictScreenScreen: React.FC = () => {
             titleStyle={{fontSize: 13}}
             title="Clear fixtures"
             onPress={() => {
-              setAllFixtures([]);
+              dispatch(setAllFixturesAction([]));
               setCurrentFixtures([]);
-              setPredictedFixtures([]);
-              setPredictedLeagues([]);
+              dispatch(setPredictedFixturesAction([]));
+              dispatch(setPredictedLeaguesAction([]));
               dispatch(setSelectedLeaguesAction([]));
             }}
           />

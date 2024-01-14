@@ -69,7 +69,7 @@ const FixtureDetailsScreen: React.FC<FixtureDetailsProps> = ({route}) => {
     <View style={styles.tables}>
       <Text style={{fontWeight: '600', fontSize: 18}}>Standings</Text>
       {leaguesStandings
-        .filter(
+        ?.filter(
           data => data.response[0].league.id === route.params.fixture.league.id,
         )[0]
         .response[0].league.standings.map(standings => {

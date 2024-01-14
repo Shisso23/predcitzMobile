@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { predictMultiGoals0_3 } from "./0-3-goals";
 import { predictAwayCleanSheet } from "./away-clean-sheet";
 import { predictAwayOrDraw } from "./away-or-draw";

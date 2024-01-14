@@ -6,6 +6,9 @@ import {ListItem} from '@rneui/base';
 import useTheme from '../../../theme/hooks/useTheme';
 import {Colors} from '../../../theme/Variables';
 import {LeagueDataModel} from '../../../models/leagues/index';
+import {useSelector} from 'react-redux';
+import {leaguesSelector} from '../../../reducers/leagues/leagues.reducer';
+import flashService from '../../../services/flash-service/flash.service';
 
 type LeagueItemProps = {
   onPress: Function;
@@ -20,6 +23,7 @@ const LeagueItem: React.FC<LeagueItemProps> = ({
   selected,
   disabled,
 }) => {
+  const {selectedLeagues} = useSelector(leaguesSelector);
   const [isSelected, setIsSelected] = useState(selected);
   const {Gutters} = useTheme();
 
@@ -28,8 +32,13 @@ const LeagueItem: React.FC<LeagueItemProps> = ({
   }, []);
 
   const handleSelect = () => {
-    onPress(!isSelected);
-    setIsSelected(!isSelected);
+    console.log({isSelected});
+    if (selectedLeagues.length === 4 && !isSelected) {
+      flashService.info('Maximum number of leagues selected!');
+    } else {
+      onPress(!isSelected);
+      setIsSelected(!isSelected);
+    }
   };
 
   return (

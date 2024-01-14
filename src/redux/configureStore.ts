@@ -11,6 +11,7 @@ const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   blacklist: ['userReducer'],
+  whiteList: ['leaguesReducer', 'fixturesReducer', 'standingsReducer'],
 };
 
 export const persistedReducer = persistReducer(persistConfig, reducers);
