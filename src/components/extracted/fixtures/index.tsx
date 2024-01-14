@@ -18,29 +18,17 @@ import {betOptionModel} from '../../../models/bet-option-model/index';
 import {AppStackProps} from '../../../navigation/app/types';
 import {useSelector} from 'react-redux';
 import {appSelector} from '../../../reducers/app/app-reducer';
+import {fixturesSelector} from '../../../reducers/fixtures/fixtures.reducer';
 
 type FixturesProps = {
-  groupedFixtures: {
-    fixtures: FixtureDataModel[];
-    option: {
-      name: String;
-      id: number;
-      level: number;
-      shortName: String;
-      description: string;
-    };
-  }[];
   leaguesStandings: StandingsModel[];
   allFixtures: FixtureDataModel[];
 };
-const Fixtures: React.FC<FixturesProps> = ({
-  groupedFixtures,
-  leaguesStandings,
-  allFixtures,
-}) => {
-  const {Common, Layout, Gutters, Images, Fonts} = useTheme();
+const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
+  const {predictedFixtures} = useSelector(fixturesSelector);
+  const {Common, Layout, Gutters, Fonts} = useTheme();
   const [selectedItem, setSelectedItem] = useState<FixtureDataModel>();
-  const [selectedOption, setSelectedOption] = useState<betOptionModel>();
+  const [ setSelectedOption] = useState<betOptionModel>();
   const [standingsModelVisible, setStandingsModelVisible] = useState(false);
   const [favoriteFixtures, setFavoriteFixtures] = useState<
     {fixture: FixtureDataModel; option: betOptionModel}[] | null
@@ -50,15 +38,21 @@ const Fixtures: React.FC<FixturesProps> = ({
 
   const reformatData = () => {
     const fixtures =
-      __DEV__ && debugging ? goupedFixturesMock : groupedFixtures;
+      __DEV__ && debugging ? goupedFixturesMock : predictedFixtures;
     // const fixtures = groupedFixtures;
     const data = fixtures
-      .map(data_ => ({
+      .map((data_: {fixtures: FixtureDataModel[]; option: betOptionModel}) => ({
         title: data_.option.shortName,
         data: data_.fixtures,
         option: data_.option,
       }))
-      .filter(reformedData => reformedData.data.length > 0);
+      .filter(
+        (reformedData: {
+          title: string;
+          data: FixtureDataModel[];
+          option: betOptionModel;
+        }) => reformedData.data.length > 0,
+      );
     return data;
   };
 

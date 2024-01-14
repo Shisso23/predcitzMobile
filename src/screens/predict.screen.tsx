@@ -60,7 +60,7 @@ const PredictScreenScreen: React.FC = () => {
   const dispatch = useDispatch<any>();
   const {Images, Gutters, Layout} = useTheme();
   const selectedLeaguesData = useSelector(leaguesSelector);
-  const {predictedFixtures, allFixtures} = useSelector(fixturesSelector);
+  const {allFixtures} = useSelector(fixturesSelector);
   const [standingsLoading, setStandingsLoading] = useState(false);
   const {leaguesStandings} = useSelector(standingsSelector);
   const {predictedLeagues} = useSelector(leaguesSelector);
@@ -161,7 +161,7 @@ const PredictScreenScreen: React.FC = () => {
     console.log({futureFixtures});
   }, [futureFixtures?.length]);
 
-  const fetchFixtures = () => {
+  const fetchFixtures = async () => {
     let leagueToFetchFixturesFor: LeagueDataLeagueModel[] = [];
     selectedLeaguesData.selectedLeagues.forEach((league: LeagueDataModel) => {
       if (
@@ -176,7 +176,7 @@ const PredictScreenScreen: React.FC = () => {
       }
     });
 
-    fetchLeaguesSeasonsFixtures(leagueToFetchFixturesFor);
+    await fetchLeaguesSeasonsFixtures(leagueToFetchFixturesFor);
   };
 
   const predict = () => {
@@ -280,8 +280,8 @@ const PredictScreenScreen: React.FC = () => {
           dispatch(
             setAllFixturesAction([...allFixtures, ...allSortedFixtures]),
           );
-          setFutureFixtures([...futureFixtures, ...futureSortedFixtures]);
           setToDate(new Date(moment(toDate).subtract(1).format('YYYY-MM-DD')));
+          setFutureFixtures([...futureFixtures, ...futureSortedFixtures]);
         }
       })
       .finally(() => {
@@ -291,7 +291,7 @@ const PredictScreenScreen: React.FC = () => {
 
   const handleNextClick = async () => {
     setStandingsLoading(true);
-    fetchFixtures();
+    await fetchFixtures();
     return Promise.all(
       selectedLeaguesData.selectedLeagues.map((league: LeagueDataModel) => {
         return getStandingsByLeagueId({
@@ -387,7 +387,6 @@ const PredictScreenScreen: React.FC = () => {
         </View>
 
         <Fixtures
-          groupedFixtures={predictedFixtures}
           leaguesStandings={leaguesStandings}
           allFixtures={allFixtures}
         />
@@ -403,6 +402,9 @@ const PredictScreenScreen: React.FC = () => {
         <LeagueActionSheetContent
           showResults={async () => {
             await handleNextClick();
+            if (currentFixtures?.length > 0) {
+              setToDate(moment(toDate).subtract(1, 'days').toDate);
+            }
           }}
           favoriteLeagues={
             __DEV__ && debugging ? favLeaguesMock : favoriteLeagues
