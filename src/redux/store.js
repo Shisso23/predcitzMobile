@@ -10,5 +10,6 @@ const middleware = [ReduxThunk, ReduxPromise];
 
 export default configureStore({
   reducer: persistedReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({serializableCheck: false}).concat(middleware),
 });

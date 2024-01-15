@@ -261,15 +261,17 @@ const PredictScreenScreen: React.FC = () => {
       .then(responses => {
         if (responses) {
           console.log({responses});
-          const allSortedFixtures = responses
+          const allSortedFixtures = (responses as unknown as FixtureDataModel[])
             .flat()
             .sort((fixtureA, fixtureB) => {
               return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
             });
           const futureSortedFixtures = filterFutureFixtures(
-            responses.flat().sort((fixtureA, fixtureB) => {
-              return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
-            }),
+            (responses as unknown as FixtureDataModel[])
+              .flat()
+              .sort((fixtureA, fixtureB) => {
+                return fixtureB.fixture.timestamp - fixtureA.fixture.timestamp;
+              }),
           );
           dispatch(
             setPredictedLeaguesAction([
@@ -280,7 +282,7 @@ const PredictScreenScreen: React.FC = () => {
           dispatch(
             setAllFixturesAction([...allFixtures, ...allSortedFixtures]),
           );
-          setToDate(new Date(moment(toDate).subtract(1).format('YYYY-MM-DD')));
+          setToDate(moment(fromDate).add(1, 'days').toDate());
           setFutureFixtures([...futureFixtures, ...futureSortedFixtures]);
         }
       })
@@ -403,7 +405,7 @@ const PredictScreenScreen: React.FC = () => {
           showResults={async () => {
             await handleNextClick();
             if (currentFixtures?.length > 0) {
-              setToDate(moment(toDate).subtract(1, 'days').toDate);
+              setToDate(moment(fromDate).add(1, 'days').toDate());
             }
           }}
           favoriteLeagues={

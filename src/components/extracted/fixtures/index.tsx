@@ -28,7 +28,6 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
   const {predictedFixtures} = useSelector(fixturesSelector);
   const {Common, Layout, Gutters, Fonts} = useTheme();
   const [selectedItem, setSelectedItem] = useState<FixtureDataModel>();
-  const [ setSelectedOption] = useState<betOptionModel>();
   const [standingsModelVisible, setStandingsModelVisible] = useState(false);
   const [favoriteFixtures, setFavoriteFixtures] = useState<
     {fixture: FixtureDataModel; option: betOptionModel}[] | null
@@ -39,20 +38,13 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
   const reformatData = () => {
     const fixtures =
       __DEV__ && debugging ? goupedFixturesMock : predictedFixtures;
-    // const fixtures = groupedFixtures;
     const data = fixtures
-      .map((data_: {fixtures: FixtureDataModel[]; option: betOptionModel}) => ({
+      .map(data_ => ({
         title: data_.option.shortName,
         data: data_.fixtures,
         option: data_.option,
       }))
-      .filter(
-        (reformedData: {
-          title: string;
-          data: FixtureDataModel[];
-          option: betOptionModel;
-        }) => reformedData.data.length > 0,
-      );
+      .filter(reformedData => reformedData.data.length > 0);
     return data;
   };
 
@@ -60,10 +52,8 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
     (item: FixtureDataModel, option: betOptionModel) => () => {
       if (selectedItem?.fixture.id === item.fixture.id) {
         setSelectedItem(undefined);
-        setSelectedOption(undefined);
       } else {
         setSelectedItem(item);
-        setSelectedOption(option);
       }
       // setStandingsModelVisible(true);
       navigation.navigate('fixtureDetails', {

@@ -1,7 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
-import type {PayloadAction} from '@reduxjs/toolkit';
+import type {PayloadAction, Selector} from '@reduxjs/toolkit';
 import {FixtureDataModel, FixturesModel} from '../../models/fixtures/index';
 import {betOptionModel} from '../../models/bet-option-model';
+import {RootState} from '../root.reducer';
 
 export interface FixturesState {
   fixtures: FixturesModel;
@@ -54,5 +55,7 @@ export const {
   setPredictedFixtures,
   setAllFixtures,
 } = fixturesSlice.actions;
-export const fixturesSelector = (reducers: any) => reducers.fixturesReducer;
+export const fixturesSelector: Selector<RootState, FixturesState> = (
+  reducers: any,
+) => reducers.fixturesReducer;
 export default fixturesSlice.reducer;
