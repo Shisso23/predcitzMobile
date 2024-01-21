@@ -212,10 +212,22 @@ const PredictScreenScreen: React.FC = () => {
   };
 
   const predict = () => {
-    const predictions = selectedOptions.map((option: betOptionModel) =>
-      option.predict({currentFixtures, allFixtures, leaguesStandings}),
+    const initialValue: number = 0;
+    const sumWithInitial = predictedFixtures.reduce(
+      (accumulator, currentValue) => accumulator + currentValue.fixtures.length,
+      initialValue,
     );
-    dispatch(setPredictedFixturesAction(predictions));
+    if (sumWithInitial >= 15) {
+      flashService.inbox(
+        'Max number reached!',
+        'Clear fixtures to make more predictions!',
+      );
+    } else {
+      const predictions = selectedOptions.map((option: betOptionModel) =>
+        option.predict({currentFixtures, allFixtures, leaguesStandings}),
+      );
+      dispatch(setPredictedFixturesAction(predictions));
+    }
   };
 
   const handleDateConfirmed = (date: Date) => {
@@ -471,6 +483,7 @@ const PredictScreenScreen: React.FC = () => {
       <DateTimePicker
         isVisible={datePickerVisible}
         mode="date"
+        minimumDate={new Date()}
         onConfirm={handleDateConfirmed}
         date={dateToChange === 'startDate' ? fromDate : toDate}
         onCancel={() => setDatePickerVisible(false)}
