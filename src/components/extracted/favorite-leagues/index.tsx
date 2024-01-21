@@ -17,6 +17,7 @@ type FavoriteLeaguesProps = {
   predictedLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   loading: boolean;
+  remainingSeconds: number;
 };
 const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
   favoriteLeagues,
@@ -25,6 +26,7 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
   predictedLeagues,
   loading,
   closeActionSheet,
+  remainingSeconds,
 }) => {
   const {Common, Layout, Gutters} = useTheme();
   const dispatch = useDispatch<any>();
@@ -56,7 +58,7 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
     return (
       <View style={[Layout.rowBetween, Gutters.regularMargin]}>
         <Button
-          title="Show results"
+          title={remainingSeconds < 60 ? 'Please wait 60 sec' : 'Show results'}
           onPress={async () => {
             showResults(selectedLeagues).then(() => {
               closeActionSheet();
@@ -66,6 +68,7 @@ const FavoriteLeagues: React.FC<FavoriteLeaguesProps> = ({
             Common.submitButtonContainer,
             styles.showResultsButton,
           ]}
+          disabled={remainingSeconds < 60}
           loading={loading}
           buttonStyle={[Common.submitButton, styles.showResultsButtonStyle]}
         />

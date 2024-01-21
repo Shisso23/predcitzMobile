@@ -41,6 +41,7 @@ const HomeScreen: React.FC = () => {
           }}>
           Score big with our soccer betting predictions
         </Text>
+        <View style={{height: 5}} />
         <Button
           title="Start"
           onPress={onStart}

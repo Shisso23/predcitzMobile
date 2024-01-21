@@ -63,6 +63,7 @@ const PredictScreenScreen: React.FC = () => {
   const {allFixtures} = useSelector(fixturesSelector);
   const [standingsLoading, setStandingsLoading] = useState(false);
   const {leaguesStandings} = useSelector(standingsSelector);
+  const {predictedFixtures} = useSelector(fixturesSelector);
   const {predictedLeagues} = useSelector(leaguesSelector);
   const {leagues} = useSelector(leaguesSelector);
   const [leaguesModalVisible, setLeaguesModalVisible] =
@@ -71,8 +72,6 @@ const PredictScreenScreen: React.FC = () => {
   const [currentFixtures, setCurrentFixtures] = useState<FixtureDataModel[]>(
     [],
   );
-  // const [loadingStandings, setLoadingStandings] = useState<Boolean>(false);
-
   const [isLoadingLeagues, setIsLoadingLeagues] = useState(false);
   const [datesViewExapanded, setDatesViewExapanded] = useState(false);
 
@@ -93,14 +92,47 @@ const PredictScreenScreen: React.FC = () => {
   const [favoriteLeagues, setFavoriteLeagues] = useState([]);
   const [readyToFetch, setReadyToFetch] = useState(false);
   const {debugging} = useSelector(appSelector);
+  const [isResultsButtonDisabled, setIsResultsButtonDisabled] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(60);
+
   const leaguesFilters: LeaguesFilterModel = {
     current: true,
     season: seasonsBack[0],
     type: 'league',
   };
 
+  useEffect(() => {
+    let countdownInterval: number;
+
+    if (isResultsButtonDisabled) {
+      countdownInterval = setInterval(() => {
+        setRemainingSeconds(prevSeconds => prevSeconds - 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(countdownInterval);
+    };
+  }, [isResultsButtonDisabled]);
+
+  const resetCounter = () => {
+    setRemainingSeconds(60);
+  };
+
   const handleFABPress = () => {
-    setLeaguesModalVisible(true);
+    const initialValue: number = 0;
+    const sumWithInitial = predictedFixtures.reduce(
+      (accumulator, currentValue) => accumulator + currentValue.fixtures.length,
+      initialValue,
+    );
+    if (sumWithInitial >= 15) {
+      flashService.inbox(
+        'Max number reached!',
+        'Clear fixtures to make more predictions!',
+      );
+    } else {
+      setLeaguesModalVisible(true);
+    }
   };
 
   const closeLeaguesModal = () => {
@@ -186,14 +218,6 @@ const PredictScreenScreen: React.FC = () => {
     dispatch(setPredictedFixturesAction(predictions));
   };
 
-  const sortStandings = (fixtureTeamsStandings: StandingsResponseModel[]) => {
-    return fixtureTeamsStandings.sort((standDingsTeam1, standingsTeam2) => {
-      return (
-        standDingsTeam1.league.standings[0][0].rank -
-        standingsTeam2.league.standings[0][0].rank
-      );
-    });
-  };
   const handleDateConfirmed = (date: Date) => {
     if (dateToChange === 'startDate') {
       setFromDate(new Date(moment(date).format('YYYY-MM-DD')));
@@ -381,6 +405,8 @@ const PredictScreenScreen: React.FC = () => {
             onPress={() => {
               dispatch(setAllFixturesAction([]));
               setCurrentFixtures([]);
+              setFutureFixtures([]);
+              dispatch(setStandingsAction([]));
               dispatch(setPredictedFixturesAction([]));
               dispatch(setPredictedLeaguesAction([]));
               dispatch(setSelectedLeaguesAction([]));
@@ -403,7 +429,21 @@ const PredictScreenScreen: React.FC = () => {
         overlayStyle={styles.overlay}>
         <LeagueActionSheetContent
           showResults={async () => {
-            await handleNextClick();
+            if (!isResultsButtonDisabled) {
+              if (selectedLeaguesData.selectedLeagues.length >= 4) {
+                setIsResultsButtonDisabled(true);
+              }
+
+              // Simulate an API call (replace this with your actual API call)
+              await handleNextClick();
+              if (selectedLeaguesData.selectedLeagues.length >= 4) {
+                setTimeout(() => {
+                  setIsResultsButtonDisabled(false);
+                  resetCounter();
+                }, 60000);
+              }
+            }
+
             if (currentFixtures?.length > 0) {
               setToDate(moment(fromDate).add(1, 'days').toDate());
             }
@@ -418,6 +458,7 @@ const PredictScreenScreen: React.FC = () => {
           initiallySelectedLeagues={selectedLeaguesData.selectedLeagues}
           predictedLeagues={predictedLeagues}
           loading={standingsLoading}
+          remainingSeconds={remainingSeconds}
         />
       </Dialog>
 

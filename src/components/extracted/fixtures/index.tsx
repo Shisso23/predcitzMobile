@@ -4,7 +4,6 @@ import {SafeAreaView, SectionList} from 'react-native';
 import moment from 'moment';
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
-import {Dialog} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 
 import {FixtureDataModel} from '../../../models/fixtures';
@@ -28,7 +27,6 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
   const {predictedFixtures} = useSelector(fixturesSelector);
   const {Common, Layout, Gutters, Fonts} = useTheme();
   const [selectedItem, setSelectedItem] = useState<FixtureDataModel>();
-  const [standingsModelVisible, setStandingsModelVisible] = useState(false);
   const [favoriteFixtures, setFavoriteFixtures] = useState<
     {fixture: FixtureDataModel; option: betOptionModel}[] | null
   >(null);
@@ -55,17 +53,12 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
       } else {
         setSelectedItem(item);
       }
-      // setStandingsModelVisible(true);
       navigation.navigate('fixtureDetails', {
         leaguesStandings,
         fixture: item,
         allFixtures,
       });
     };
-
-  const closeStandingsModel = () => {
-    setStandingsModelVisible(false);
-  };
 
   const handleAddToFavorite =
     ({
@@ -234,16 +227,7 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
         ListEmptyComponent={renderEmptyLsitContent}
         ListFooterComponent={<View style={{height: 60}} />}
       />
-
-      <Dialog
-        isVisible={standingsModelVisible}
-        onBackdropPress={closeStandingsModel}
-        presentationStyle="overFullScreen"
-        overlayStyle={styles.standingsModel}>
-        <View style={styles.standingsContainer}>
-          <Text style={{fontWeight: '600', fontSize: 18}}>Standings</Text>
-        </View>
-      </Dialog>
+      <View style={{height: 70}} />
     </SafeAreaView>
   );
 };

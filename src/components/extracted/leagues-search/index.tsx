@@ -20,6 +20,7 @@ type SearchLeaguesProps = {
   predictedLeagues: LeagueDataModel[];
   closeActionSheet: Function;
   loading: boolean;
+  remainingSeconds: number;
 };
 const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   allLeagues,
@@ -28,6 +29,7 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
   predictedLeagues,
   loading,
   closeActionSheet,
+  remainingSeconds,
 }) => {
   const {Common, Layout, Gutters, Images} = useTheme();
   const dispatch = useDispatch<any>();
@@ -113,7 +115,7 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
     return (
       <View style={[Layout.rowBetween, Gutters.regularMargin]}>
         <Button
-          title="Show results"
+          title={remainingSeconds < 60 ? 'Please wait 60 sec' : 'Show results'}
           onPress={async () => {
             showResults(selectedLeagues).then(() => {
               closeActionSheet();
@@ -123,6 +125,7 @@ const SearchLeagues: React.FC<SearchLeaguesProps> = ({
             Common.submitButtonContainer,
             styles.showResultsButton,
           ]}
+          disabled={remainingSeconds < 60}
           loading={loading}
           buttonStyle={[Common.submitButton, styles.showResultsButtonStyle]}
         />

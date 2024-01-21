@@ -17,6 +17,7 @@ type LeagueyActionSheetContentProps = {
   initiallySelectedLeagues: LeagueDataModel[];
   predictedLeagues: LeagueDataModel[];
   loading: boolean;
+  remainingSeconds: number;
 };
 
 const screenHeight = Dimensions.get('window').height;
@@ -29,6 +30,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
   initiallySelectedLeagues,
   predictedLeagues,
   loading,
+  remainingSeconds,
 }) => {
   const {Gutters, Layout, Images} = useTheme();
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -97,6 +99,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
           predictedLeagues={predictedLeagues}
           showResults={showResults}
           loading={loading}
+          remainingSeconds={remainingSeconds}
         />
       ) : (
         <SearchLeagues
@@ -106,6 +109,7 @@ const LeagueActionSheetContent: React.FC<LeagueyActionSheetContentProps> = ({
           predictedLeagues={predictedLeagues}
           showResults={showResults}
           loading={loading}
+          remainingSeconds={remainingSeconds}
         />
       )}
     </View>
