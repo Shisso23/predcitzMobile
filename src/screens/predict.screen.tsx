@@ -292,11 +292,9 @@ const PredictScreenScreen: React.FC = () => {
   const fetchLeaguesSeasonsFixtures = async (
     leagueToFetchFixturesFor: LeagueDataLeagueModel[],
   ) => {
-    console.log({leagueToFetchFixturesFor});
     getLeaguesSeasonsFixtures(leagueToFetchFixturesFor)
       .then(responses => {
         if (responses) {
-          console.log({responses});
           const allSortedFixtures = (responses as unknown as FixtureDataModel[])
             .flat()
             .sort((fixtureA, fixtureB) => {
@@ -445,8 +443,6 @@ const PredictScreenScreen: React.FC = () => {
               if (selectedLeaguesData.selectedLeagues.length >= 4) {
                 setIsResultsButtonDisabled(true);
               }
-
-              // Simulate an API call (replace this with your actual API call)
               await handleNextClick();
               if (selectedLeaguesData.selectedLeagues.length >= 4) {
                 setTimeout(() => {

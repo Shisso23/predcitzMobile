@@ -225,7 +225,7 @@ const Fixtures: React.FC<FixturesProps> = ({leaguesStandings, allFixtures}) => {
         )}
         style={styles.sectionList}
         ListEmptyComponent={renderEmptyLsitContent}
-        ListFooterComponent={<View style={{height: 60}} />}
+        ListFooterComponent={<View style={{height: 250}} />}
       />
     </SafeAreaView>
   );
