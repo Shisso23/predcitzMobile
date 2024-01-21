@@ -9,13 +9,16 @@ import store from './src/redux/store';
 import Toast from 'react-native-toast-message';
 import {persistor} from './src/redux/configureStore';
 
-const Root = () => (
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <App />
-      <Toast ref={ref => Toast.setRef(ref)} />
-    </PersistGate>
-  </Provider>
-);
+const Root = () => {
+  console.log({persistor: persistor.getState()});
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+        <Toast ref={ref => Toast.setRef(ref)} />
+      </PersistGate>
+    </Provider>
+  );
+};
 
 AppRegistry.registerComponent(appName, () => Root);
