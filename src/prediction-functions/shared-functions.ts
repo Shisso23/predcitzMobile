@@ -358,6 +358,51 @@ export const getLastFiveHomeTeamHomeFixtures = ({
       return false;
     }
   };
+
+  export const drawsInPreviousHomeMatches = ({
+    homeTeamFixtures,
+    percentage
+  }: {
+    homeTeamFixtures: FixtureDataModel[];
+    percentage: number;
+  }) => {
+    let conditionPassedCount = 0;
+    homeTeamFixtures.forEach(fixtureData => {
+      if (
+        fixtureData.score.fulltime.home === fixtureData.score.fulltime.away
+      ) {
+        conditionPassedCount += 1;
+      }
+    });
+    if ((conditionPassedCount / homeTeamFixtures.length)*100 >= percentage) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+
+  export const drawsInPreviousAwayMatches = ({
+    awayTeamFixtures,
+    percentage
+  }: {
+    awayTeamFixtures: FixtureDataModel[];
+    percentage: number;
+  }) => {
+    let conditionPassedCount = 0;
+    awayTeamFixtures.forEach(fixtureData => {
+      if (
+        fixtureData.score.fulltime.away === fixtureData.score.fulltime.home
+      ) {
+        conditionPassedCount += 1;
+      }
+    });
+    if ((conditionPassedCount / awayTeamFixtures.length)*100 >= percentage) {
+      return true;
+    } else {
+      return false;
+    }
+  };
   
   export const homeTeamWinsMostMatches = ({
     fixtures,
@@ -678,6 +723,8 @@ export const getLastFiveHomeTeamHomeFixtures = ({
     mostFixturesAreBTTS,
     teamWonLastFixture,
     teamDidNotLoseLastFixture,
+    drawsInPreviousAwayMatches,
+    drawsInPreviousHomeMatches,
     goodAwayTeamwinPercentage,
     goodHomeTeamwinPercentage
   }
